@@ -196,8 +196,8 @@
     </div>
 
     <!-- pdf-lib CDN -->
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/@pdf-lib/fontkit@1.0.1/dist/fontkit.umd.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 
     <script>
         // Destructure necessary modules from pdf-lib
@@ -378,7 +378,8 @@
             try {
                 // Create a new PDF document
                 const pdfDoc = await PDFDocument.create();
-                pdfDoc.registerFontkit(fontkit); // Register fontkit for advanced font features if needed, though not strictly required for StandardFonts
+                // Register fontkit AFTER it has been loaded
+                pdfDoc.registerFontkit(fontkit);
 
                 // Set PDF Meta Tags
                 pdfDoc.setTitle(pdfTitleInput.value || 'Generated Document');
@@ -396,7 +397,9 @@
                 const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
                 const pageMargin = 50; // Margin from edges
-                const contentWidth = pdfDoc.getPage(0)?.getWidth() - 2 * pageMargin; // Get page width after first page is added
+                // Ensure contentWidth is calculated after the first page is added
+                let currentPage = pdfDoc.getPages().length > 0 ? pdfDoc.getPages()[0] : pdfDoc.addPage();
+                const contentWidth = currentPage.getWidth() - 2 * pageMargin;
 
                 // --- Handle Text Input ---
                 if (currentInputType === 'text') {
@@ -412,8 +415,8 @@
                     const textColor = rgb(0.9, 0.9, 0.9); // Light gray for text
 
                     const words = textContent.split(' ');
+                    currentPage = pdfDoc.addPage(); // Add a new page for text content
                     let currentLine = '';
-                    let currentPage = pdfDoc.addPage();
                     let yPos = currentPage.getHeight() - pageMargin; // Start from top margin
 
                     for (let i = 0; i < words.length; i++) {
@@ -460,7 +463,7 @@
 
                     const imageDims = image.scale(400); // Scale image to a reasonable size
 
-                    let currentPage = pdfDoc.addPage();
+                    currentPage = pdfDoc.addPage(); // Add a new page for the image
                     const { width, height } = currentPage.getSize();
 
                     // Center the image on the page
@@ -476,6 +479,7 @@
                 }
 
                 // Ensure at least one page exists if no content was added (e.g., empty text or no image)
+                // This handles cases where user clicks generate without input, but error handles above should prevent it.
                 if (pdfDoc.getPages().length === 0) {
                     pdfDoc.addPage();
                 }
