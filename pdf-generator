@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Creator Tool - Generate PDFs from Text & Images</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Custom scrollbar for text area */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: rgba(147, 197, 253, 0.5); /* blue-300 with opacity */
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: rgba(147, 197, 253, 0.7);
+        }
+
+        /* Custom styles for accessibility focus */
+        *:focus-visible {
+            outline: 2px solid #60A5FA; /* blue-400 */
+            outline-offset: 2px;
+            border-radius: 0.25rem; /* Match Tailwind's default rounded-md */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-700 to-purple-900 text-gray-100 flex flex-col items-center p-4">
+
+    <!-- Main Container -->
+    <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-2xl p-6 md:p-8 max-w-3xl w-full border border-white border-opacity-20">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-6 text-white drop-shadow-lg">
+            PDF Creator Tool
+        </h1>
+        <p class="text-center text-gray-200 mb-8 text-lg">Generate PDFs quickly from text and images.</p>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden flex items-center justify-center p-4 bg-blue-600 bg-opacity-80 rounded-lg mb-6 text-white font-semibold">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating PDF... Please wait.
+        </div>
+
+        <!-- Error Message Display -->
+        <div id="error-message-container" class="hidden bg-red-500 bg-opacity-20 border border-red-400 text-red-200 p-4 rounded-lg mb-6 text-center">
+            <p class="font-semibold">Error:</p>
+            <p id="error-message-text"></p>
+        </div>
+
+        <!-- Input Type Selection Tabs -->
+        <div class="flex border-b border-gray-600 mb-6">
+            <button id="tab-text" class="flex-1 py-3 px-4 text-center text-lg font-semibold rounded-t-lg bg-blue-600 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition duration-200">
+                <i class="fas fa-font mr-2"></i> Text Input
+            </button>
+            <button id="tab-image" class="flex-1 py-3 px-4 text-center text-lg font-semibold rounded-t-lg text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition duration-200">
+                <i class="fas fa-image mr-2"></i> Image Input
+            </button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="text-input-section" class="input-section">
+            <label for="text-content" class="block text-lg font-semibold mb-2 text-white text-opacity-90">
+                Enter Text Content:
+            </label>
+            <textarea id="text-content" rows="10" placeholder="Type or paste your text here to include it in the PDF.&#10;&#10;Example:&#10;This is a sample document created using the Online PDF Creator Tool.&#10;&#10;You can add multiple paragraphs and lines of text. The tool will automatically handle pagination for long content.&#10;&#10;Feel free to customize the PDF with meta tags, watermarks, and headers/footers in the settings section below."
+                class="w-full p-3 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
+        </div>
+
+        <div id="image-input-section" class="input-section hidden">
+            <label for="image-upload" class="block text-lg font-semibold mb-2 text-white text-opacity-90">
+                Upload Image (PNG, JPG, JPEG):
+            </label>
+            <input type="file" id="image-upload" accept="image/png, image/jpeg, image/jpg"
+                class="block w-full text-sm text-gray-200
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-full file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-blue-500 file:text-white
+                       hover:file:bg-blue-600 cursor-pointer
+                       transition duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+            <div id="image-preview-container" class="mt-4 text-center hidden">
+                <p class="text-sm text-white text-opacity-70 mb-2">Image Preview:</p>
+                <img id="image-preview" src="#" alt="Uploaded image preview" class="max-h-64 max-w-full rounded-lg shadow-md mx-auto border border-white border-opacity-30">
+            </div>
+        </div>
+
+        <!-- PDF Settings Section -->
+        <div class="mt-8 p-6 bg-white bg-opacity-10 rounded-xl shadow-inner border border-white border-opacity-20">
+            <h3 class="text-2xl font-bold mb-4 text-white drop-shadow-md">PDF Settings & Customization</h3>
+
+            <!-- Meta Tags -->
+            <div class="mb-6">
+                <h4 class="text-xl font-semibold mb-3 text-blue-300">Meta Tags</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="pdf-title" class="block text-sm font-medium text-gray-300 mb-1">Title:</label>
+                        <input type="text" id="pdf-title" placeholder="Document Title"
+                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="pdf-author" class="block text-sm font-medium text-gray-300 mb-1">Author:</label>
+                        <input type="text" id="pdf-author" placeholder="Document Author"
+                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="pdf-keywords" class="block text-sm font-medium text-gray-300 mb-1">Keywords (comma-separated):</label>
+                        <input type="text" id="pdf-keywords" placeholder="keywords, separated, by, comma"
+                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Version & Encryption -->
+            <div class="mb-6">
+                <h4 class="text-xl font-semibold mb-3 text-blue-300">Version & Security</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="pdf-version" class="block text-sm font-medium text-gray-300 mb-1">PDF Version:</label>
+                        <select id="pdf-version"
+                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+                            <option value="1.7" class="bg-gray-800">1.7 (Default)</option>
+                            <option value="1.4" class="bg-gray-800">1.4</option>
+                            <option value="1.5" class="bg-gray-800">1.5</option>
+                            <option value="1.6" class="bg-gray-800">1.6</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="encryption-password" class="block text-sm font-medium text-gray-300 mb-1">Encryption Password (Optional):</label>
+                        <input type="password" id="encryption-password" placeholder="Leave blank for no encryption"
+                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customization: Watermark, Header, Footer -->
+            <div>
+                <h4 class="text-xl font-semibold mb-3 text-blue-300">Page Customization</h4>
+                <div class="mb-4">
+                    <label for="watermark-text" class="block text-sm font-medium text-gray-300 mb-1">Watermark Text (Optional):</label>
+                    <input type="text" id="watermark-text" placeholder="e.g., DRAFT, CONFIDENTIAL"
+                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div class="mb-4">
+                    <label for="header-text" class="block text-sm font-medium text-gray-300 mb-1">Header Text (Optional):</label>
+                    <input type="text" id="header-text" placeholder="e.g., Company Name, Document Title"
+                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div>
+                    <label for="footer-text" class="block text-sm font-medium text-gray-300 mb-1">Footer Text (Optional):</label>
+                    <input type="text" id="footer-text" placeholder="e.g., Page [pageNumber] of [pageCount]"
+                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <p class="text-xs text-gray-400 mt-1">Use `[pageNumber]` and `[pageCount]` for dynamic page numbering.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate PDF Button -->
+        <div class="mt-8 text-center">
+            <button id="generate-pdf-button"
+                class="w-full md:w-auto px-8 py-3 rounded-full text-lg font-bold
+                       bg-green-500 hover:bg-green-600 text-white shadow-lg
+                       transition duration-300 ease-in-out transform hover:scale-105
+                       focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75">
+                <i class="fas fa-file-export mr-2"></i> Generate PDF
+            </button>
+        </div>
+
+        <!-- Download Link -->
+        <div id="download-section" class="mt-8 text-center hidden">
+            <h3 class="text-2xl font-bold mb-4 text-white drop-shadow-md">Download Your PDF</h3>
+            <a id="download-pdf-link" href="#" download="generated-document.pdf"
+                class="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg
+                       transition duration-300 ease-in-out transform hover:scale-105
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                <i class="fas fa-download mr-2"></i> Download PDF
+            </a>
+        </div>
+
+    </div>
+
+    <!-- pdf-lib CDN -->
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@1.0.1/dist/fontkit.umd.min.js"></script>
+
+    <script>
+        // Destructure necessary modules from pdf-lib
+        const { PDFDocument, rgb, StandardFonts, PDFName, PDFString, PDFArray, PDFDict } = PDFLib;
+
+        // --- DOM Element References ---
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessageContainer = document.getElementById('error-message-container');
+        const errorMessageText = document.getElementById('error-message-text');
+
+        const tabText = document.getElementById('tab-text');
+        const tabImage = document.getElementById('tab-image');
+        const textInputSection = document.getElementById('text-input-section');
+        const imageInputSection = document.getElementById('image-input-section');
+
+        const textContentInput = document.getElementById('text-content');
+        const imageUploadInput = document.getElementById('image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+
+        const pdfTitleInput = document.getElementById('pdf-title');
+        const pdfAuthorInput = document.getElementById('pdf-author');
+        const pdfKeywordsInput = document.getElementById('pdf-keywords');
+        const pdfVersionSelect = document.getElementById('pdf-version');
+        const encryptionPasswordInput = document.getElementById('encryption-password');
+
+        const watermarkTextInput = document.getElementById('watermark-text');
+        const headerTextInput = document.getElementById('header-text');
+        const footerTextInput = document.getElementById('footer-text');
+
+        const generatePdfButton = document.getElementById('generate-pdf-button');
+        const downloadSection = document.getElementById('download-section');
+        const downloadPdfLink = document.getElementById('download-pdf-link');
+
+        // --- Global State Variables ---
+        let currentInputType = 'text'; // 'text' or 'image'
+        let uploadedImageBytes = null; // Stores image data as Uint8Array
+        let uploadedImageType = null; // Stores image MIME type
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a message in the error container.
+         * @param {string} message The error message to display.
+         */
+        function displayError(message) {
+            errorMessageText.textContent = message;
+            errorMessageContainer.classList.remove('hidden');
+        }
+
+        /**
+         * Clears any displayed error messages.
+         */
+        function clearError() {
+            errorMessageText.textContent = '';
+            errorMessageContainer.classList.add('hidden');
+        }
+
+        /**
+         * Shows the loading indicator and disables the generate button.
+         */
+        function showLoading() {
+            loadingIndicator.classList.remove('hidden');
+            generatePdfButton.disabled = true;
+            generatePdfButton.classList.add('opacity-50', 'cursor-not-allowed');
+            downloadSection.classList.add('hidden'); // Hide download link during generation
+            clearError(); // Clear any previous errors
+        }
+
+        /**
+         * Hides the loading indicator and enables the generate button.
+         */
+        function hideLoading() {
+            loadingIndicator.classList.add('hidden');
+            generatePdfButton.disabled = false;
+            generatePdfButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        /**
+         * Switches the active input section (Text or Image).
+         * @param {string} type 'text' or 'image'.
+         */
+        function switchInputSection(type) {
+            currentInputType = type;
+
+            // Update tab styling
+            if (type === 'text') {
+                tabText.classList.add('bg-blue-600', 'text-white');
+                tabText.classList.remove('bg-gray-700', 'text-gray-300', 'hover:bg-gray-700');
+                tabImage.classList.remove('bg-blue-600', 'text-white');
+                tabImage.classList.add('bg-gray-700', 'text-gray-300', 'hover:bg-gray-700');
+                showElement(textInputSection);
+                hideElement(imageInputSection);
+            } else { // type === 'image'
+                tabImage.classList.add('bg-blue-600', 'text-white');
+                tabImage.classList.remove('bg-gray-700', 'text-gray-300', 'hover:bg-gray-700');
+                tabText.classList.remove('bg-blue-600', 'text-white');
+                tabText.classList.add('bg-gray-700', 'text-gray-300', 'hover:bg-gray-700');
+                showElement(imageInputSection);
+                hideElement(textInputSection);
+            }
+            // Clear previous PDF generation results when switching input types
+            hideElement(downloadSection);
+            clearError();
+        }
+
+        /**
+         * Hides an HTML element by adding the 'hidden' class.
+         * @param {HTMLElement} element The element to hide.
+         */
+        function hideElement(element) {
+            element.classList.add('hidden');
+        }
+
+        /**
+         * Shows an HTML element by removing the 'hidden' class.
+         * @param {HTMLElement} element The element to show.
+         */
+        function showElement(element) {
+            element.classList.remove('hidden');
+        }
+
+        // --- Event Listeners ---
+
+        // Tab switching
+        tabText.addEventListener('click', () => switchInputSection('text'));
+        tabImage.addEventListener('click', () => switchInputSection('image'));
+
+        // Image upload handling
+        imageUploadInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type
+                if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+                    displayError('Only PNG and JPG/JPEG images are supported.');
+                    hideElement(imagePreviewContainer);
+                    uploadedImageBytes = null;
+                    uploadedImageType = null;
+                    return;
+                }
+
+                clearError();
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.alt = `Preview of ${file.name}`; // Accessibility: Alt text for image preview
+                    showElement(imagePreviewContainer);
+                    try {
+                        uploadedImageBytes = await fetch(e.target.result).then(res => res.arrayBuffer());
+                        uploadedImageType = file.type;
+                    } catch (error) {
+                        displayError('Failed to read image file. Please try again.');
+                        console.error('Image read error:', error);
+                        uploadedImageBytes = null;
+                        uploadedImageType = null;
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                hideElement(imagePreviewContainer);
+                uploadedImageBytes = null;
+                uploadedImageType = null;
+            }
+            hideElement(downloadSection); // Hide download link on new image upload
+        });
+
+        // Generate PDF Button Click
+        generatePdfButton.addEventListener('click', generatePdf);
+
+        // --- Main PDF Generation Function ---
+
+        /**
+         * Generates the PDF document based on user inputs and settings.
+         */
+        async function generatePdf() {
+            showLoading(); // Show loading indicator
+
+            try {
+                // Create a new PDF document
+                const pdfDoc = await PDFDocument.create();
+                pdfDoc.registerFontkit(fontkit); // Register fontkit for advanced font features if needed, though not strictly required for StandardFonts
+
+                // Set PDF Meta Tags
+                pdfDoc.setTitle(pdfTitleInput.value || 'Generated Document');
+                pdfDoc.setAuthor(pdfAuthorInput.value || 'PDF Creator Tool');
+                pdfDoc.setKeywords((pdfKeywordsInput.value || 'pdf, generator, tool, online').split(',').map(k => k.trim()));
+                pdfDoc.setProducer('Online PDF Creator Tool');
+                pdfDoc.setCreator('Online PDF Creator Tool');
+
+                // Set PDF Version
+                const pdfVersion = parseFloat(pdfVersionSelect.value);
+                pdfDoc.setVersion(pdfVersion);
+
+                // Embed a standard font
+                const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+                const pageMargin = 50; // Margin from edges
+                const contentWidth = pdfDoc.getPage(0)?.getWidth() - 2 * pageMargin; // Get page width after first page is added
+
+                // --- Handle Text Input ---
+                if (currentInputType === 'text') {
+                    const textContent = textContentInput.value;
+                    if (!textContent.trim()) {
+                        displayError('Please enter some text content.');
+                        hideLoading();
+                        return;
+                    }
+
+                    const fontSize = 12;
+                    const lineHeight = fontSize * 1.5;
+                    const textColor = rgb(0.9, 0.9, 0.9); // Light gray for text
+
+                    const words = textContent.split(' ');
+                    let currentLine = '';
+                    let currentPage = pdfDoc.addPage();
+                    let yPos = currentPage.getHeight() - pageMargin; // Start from top margin
+
+                    for (let i = 0; i < words.length; i++) {
+                        const word = words[i];
+                        const testLine = currentLine === '' ? word : `${currentLine} ${word}`;
+                        const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+                        if (textWidth < contentWidth) {
+                            currentLine = testLine;
+                        } else {
+                            // Draw current line before adding new word
+                            if (yPos < pageMargin + lineHeight) { // Check if new page is needed
+                                currentPage = pdfDoc.addPage();
+                                yPos = currentPage.getHeight() - pageMargin;
+                                // Redraw header/footer on new page
+                                await drawHeaderFooter(currentPage, pdfDoc.getPages().length, pdfDoc.getPages().length, boldFont, pageMargin, contentWidth);
+                            }
+                            currentPage.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
+                            yPos -= lineHeight;
+                            currentLine = word; // Start new line with current word
+                        }
+                    }
+                    // Draw any remaining text on the last line
+                    if (currentLine !== '') {
+                        if (yPos < pageMargin + lineHeight) {
+                            currentPage = pdfDoc.addPage();
+                            yPos = currentPage.getHeight() - pageMargin;
+                            await drawHeaderFooter(currentPage, pdfDoc.getPages().length, pdfDoc.getPages().length, boldFont, pageMargin, contentWidth);
+                        }
+                        currentPage.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
+                    }
+                }
+                // --- Handle Image Input ---
+                else if (currentInputType === 'image') {
+                    if (!uploadedImageBytes || !uploadedImageType) {
+                        displayError('Please upload an image file.');
+                        hideLoading();
+                        return;
+                    }
+
+                    const image = uploadedImageType === 'image/png'
+                        ? await pdfDoc.embedPng(uploadedImageBytes)
+                        : await pdfDoc.embedJpg(uploadedImageBytes);
+
+                    const imageDims = image.scale(400); // Scale image to a reasonable size
+
+                    let currentPage = pdfDoc.addPage();
+                    const { width, height } = currentPage.getSize();
+
+                    // Center the image on the page
+                    const x = (width - imageDims.width) / 2;
+                    const y = (height - imageDims.height) / 2;
+
+                    currentPage.drawImage(image, {
+                        x: x,
+                        y: y,
+                        width: imageDims.width,
+                        height: imageDims.height,
+                    });
+                }
+
+                // Ensure at least one page exists if no content was added (e.g., empty text or no image)
+                if (pdfDoc.getPages().length === 0) {
+                    pdfDoc.addPage();
+                }
+
+                // --- Apply Header, Footer, Watermark to ALL pages ---
+                const totalPages = pdfDoc.getPages().length;
+                for (let i = 0; i < totalPages; i++) {
+                    const page = pdfDoc.getPages()[i];
+                    await drawHeaderFooter(page, i + 1, totalPages, boldFont, pageMargin, page.getWidth() - 2 * pageMargin);
+                    await drawWatermark(page, watermarkTextInput.value, boldFont);
+                }
+
+                // --- Apply Encryption (if password provided) ---
+                const encryptionPassword = encryptionPasswordInput.value;
+                let pdfBytes;
+                if (encryptionPassword) {
+                    pdfBytes = await pdfDoc.save({
+                        encryption: {
+                            userPassword: encryptionPassword,
+                            ownerPassword: encryptionPassword, // Owner password can be different for more control
+                            // Standard permissions (optional, default is all permissions)
+                            // permissions: [
+                            //     PDFLib.Permission.Print,
+                            //     PDFLib.Permission.Modify,
+                            //     PDFLib.Permission.Copy,
+                            //     PDFLib.Permission.Annotate,
+                            // ],
+                        },
+                    });
+                } else {
+                    pdfBytes = await pdfDoc.save();
+                }
+
+                // Create a Blob and a download link
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                downloadPdfLink.href = url;
+                downloadPdfLink.download = `${pdfTitleInput.value.replace(/[^a-zA-Z0-9]/g, '_') || 'document'}.pdf`; // Sanitize filename
+                showElement(downloadSection);
+
+            } catch (error) {
+                displayError(`Failed to generate PDF: ${error.message}. Please check your inputs.`);
+                console.error('PDF generation error:', error);
+            } finally {
+                hideLoading(); // Hide loading indicator
+            }
+        }
+
+        /**
+         * Draws the header and footer on a given PDF page.
+         * @param {PDFPage} page The PDF page object.
+         * @param {number} pageNumber The current page number (1-indexed).
+         * @param {number} totalPages The total number of pages.
+         * @param {PDFFont} font The font to use for header/footer.
+         * @param {number} margin The page margin.
+         * @param {number} contentWidth The width available for content.
+         */
+        async function drawHeaderFooter(page, pageNumber, totalPages, font, margin, contentWidth) {
+            const headerText = headerTextInput.value.trim();
+            const footerText = footerTextInput.value.trim();
+            const fontSize = 10;
+            const textColor = rgb(0.5, 0.5, 0.5); // Gray color for header/footer
+
+            // Header
+            if (headerText) {
+                const headerY = page.getHeight() - margin + 20; // Position above top margin
+                page.drawText(headerText, {
+                    x: margin,
+                    y: headerY,
+                    font,
+                    size: fontSize,
+                    color: textColor,
+                });
+            }
+
+            // Footer
+            if (footerText) {
+                let formattedFooterText = footerText
+                    .replace(/\[pageNumber\]/g, pageNumber)
+                    .replace(/\[pageCount\]/g, totalPages);
+
+                const footerY = margin - 30; // Position below bottom margin
+                const footerWidth = font.widthOfTextAtSize(formattedFooterText, fontSize);
+                const footerX = page.getWidth() / 2 - footerWidth / 2; // Center footer
+
+                page.drawText(formattedFooterText, {
+                    x: footerX,
+                    y: footerY,
+                    font,
+                    size: fontSize,
+                    color: textColor,
+                });
+            }
+        }
+
+        /**
+         * Draws a text watermark on a given PDF page.
+         * @param {PDFPage} page The PDF page object.
+         * @param {string} watermarkText The text for the watermark.
+         * @param {PDFFont} font The font to use for the watermark.
+         */
+        async function drawWatermark(page, watermarkText, font) {
+            if (!watermarkText.trim()) return;
+
+            const { width, height } = page.getSize();
+            const fontSize = 72; // Large font size for watermark
+            const opacity = 0.1; // Subtle opacity
+
+            // Calculate text dimensions
+            const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
+            const textHeight = font.heightAtSize(fontSize);
+
+            // Calculate position for diagonal placement
+            // This places the text roughly in the center, rotated
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            page.drawText(watermarkText, {
+                x: centerX - textWidth / 2, // Adjust X to center after rotation
+                y: centerY - textHeight / 2, // Adjust Y to center after rotation
+                font,
+                size: fontSize,
+                color: rgb(0.5, 0.5, 0.5), // Gray color for watermark
+                opacity: opacity,
+                rotate: PDFLib.degrees(-45), // Rotate by -45 degrees for diagonal effect
+            });
+        }
+
+        // --- Initial Setup ---
+        window.onload = () => {
+            // Ensure the correct tab is active on load
+            switchInputSection('text');
+            hideLoading(); // Hide loading indicator initially
+            hideElement(downloadSection); // Hide download section initially
+            clearError(); // Clear any initial errors
+        };
+    </script>
+</body>
+</html>
