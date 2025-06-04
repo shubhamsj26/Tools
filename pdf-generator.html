@@ -3,56 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced PDF Creator Tool - Generate from Multiple Files, Images, Text</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Advanced PDF Creator Tool - Generate from Multiple Files, Images, Text (Unstyled)</title>
+    <!-- Tailwind CSS CDN REMOVED: To restore styling, you would need to compile Tailwind CSS locally
+         or write custom CSS rules to replace the utility classes used in the HTML. -->
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Basic styles for functionality, but visual design will be lost without Tailwind */
         body {
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-        }
-        /* Custom scrollbar for text area */
-        textarea::-webkit-scrollbar {
-            width: 8px;
-        }
-        textarea::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        textarea::-webkit-scrollbar-thumb {
-            background: rgba(147, 197, 253, 0.5); /* blue-300 with opacity */
-            border-radius: 10px;
-        }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: rgba(147, 197, 253, 0.7);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: #1a202c; /* A dark background for visibility */
+            color: #e2e8f0; /* Light text color */
         }
 
-        /* Custom styles for accessibility focus */
-        *:focus-visible {
-            outline: 2px solid #60A5FA; /* blue-400 */
-            outline-offset: 2px;
-            border-radius: 0.25rem; /* Match Tailwind's default rounded-md */
+        .main-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 1.5rem;
+            max-width: 48rem; /* 4xl equivalent */
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Drag and Drop styles */
+        h1 {
+            font-size: 2.25rem; /* 4xl */
+            font-weight: 800; /* extabold */
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        p {
+            text-align: center;
+            color: #cbd5e0; /* gray-200 */
+            margin-bottom: 2rem;
+        }
+
+        /* Loading Indicator */
+        #loading-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(49, 130, 206, 0.8); /* blue-600 with opacity */
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 600;
+        }
+        #loading-indicator .spinner {
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+            height: 1.25rem;
+            width: 1.25rem;
+            color: white;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        #loading-indicator .progress-bar-container {
+            width: 100%;
+            background-color: #bfdbfe; /* blue-200 */
+            border-radius: 9999px; /* full */
+            height: 0.625rem; /* h-2.5 */
+        }
+        #loading-indicator #progress-bar {
+            background-color: #2b6cb0; /* blue-800 */
+            height: 0.625rem;
+            border-radius: 9999px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* Error Message */
+        #error-message-container {
+            background-color: rgba(239, 68, 68, 0.2); /* red-500 with opacity */
+            border: 1px solid #ef4444; /* red-400 */
+            color: #fca5a5; /* red-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* File Upload Section */
+        .file-upload-section label {
+            display: block;
+            font-size: 1.125rem; /* lg */
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
         .drag-area {
             border: 2px dashed rgba(255, 255, 255, 0.4);
             background-color: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
             transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .drag-area:hover {
+            border-color: #60a5fa; /* blue-400 */
         }
         .drag-area.drag-over {
             background-color: rgba(255, 255, 255, 0.15);
             border-color: #60A5FA; /* blue-400 */
         }
+        .drag-area i {
+            font-size: 2.25rem; /* 3xl */
+            margin-bottom: 0.5rem;
+            color: #94a3b8; /* gray-400 */
+        }
+        .drag-area p {
+            color: #cbd5e0; /* gray-300 */
+            font-size: 1.125rem; /* lg */
+            margin-bottom: 0.5rem;
+        }
+        .drag-area p span {
+            color: #60a5fa; /* blue-400 */
+            font-weight: 700;
+            text-decoration: underline;
+        }
+        .drag-area .note {
+            font-size: 0.875rem; /* sm */
+            color: #a0aec0; /* gray-400 */
+            margin-top: 0.5rem;
+        }
+        .drag-area .error-note {
+            color: #f87171; /* red-300 */
+            margin-top: 0.5rem;
+        }
 
-        /* Draggable item styles */
+        /* Uploaded Files List */
+        #uploaded-files-container h3 {
+            font-size: 1.5rem; /* 2xl */
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        #uploaded-files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
         .page-item {
             cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            color: #e2e8f0; /* gray-200 */
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .page-item:active {
@@ -64,84 +185,327 @@
             opacity: 0.5;
             border: 2px dashed #60A5FA;
         }
+        .page-item .handle {
+            color: #a0aec0; /* gray-400 */
+            margin-right: 0.75rem;
+            cursor: grab;
+        }
+        .page-item img {
+            width: 4rem; /* w-16 */
+            height: 4rem; /* h-16 */
+            object-fit: cover;
+            border-radius: 0.375rem; /* rounded-md */
+            margin-right: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .page-item i.fa-file-alt, .page-item i.fa-file {
+            font-size: 2.5rem; /* 4xl */
+            margin-right: 1rem;
+        }
+        .page-item i.fa-file-alt { color: #60a5fa; /* blue-300 */ }
+        .page-item i.fa-file { color: #a0aec0; /* gray-300 */ }
+
+        .page-item span {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.875rem; /* sm */
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .page-item span {
+                font-size: 1rem; /* base */
+            }
+        }
+        .page-item .actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* space-x-2 */
+            margin-left: 1rem;
+        }
+        .page-item button {
+            padding: 0.5rem;
+            border-radius: 9999px; /* full */
+            color: white;
+            font-size: 0.75rem; /* sm */
+            transition: background-color 0.2s ease;
+            outline: none;
+        }
+        .page-item button:focus-visible {
+            outline: 2px solid;
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        .page-item .rotate-btn {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .page-item .rotate-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .page-item .rotate-btn:focus-visible {
+            outline-color: #60a5fa; /* blue-400 */
+        }
+        .page-item .remove-btn {
+            background-color: #ef4444; /* red-500 */
+        }
+        .page-item .remove-btn:hover {
+            background-color: #dc2626; /* red-600 */
+        }
+        .page-item .remove-btn:focus-visible {
+            outline-color: #f87171; /* red-400 */
+        }
+
+        /* PDF Settings Section */
+        .settings-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .settings-section h3 {
+            font-size: 1.5rem; /* 2xl */
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .settings-section h4 {
+            font-size: 1.25rem; /* xl */
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #93c5fd; /* blue-300 */
+        }
+        .settings-section .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .settings-section .grid-cols-1.md\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .settings-section .md\:col-span-2 {
+                grid-column: span 2 / span 2;
+            }
+        }
+        .settings-section label {
+            display: block;
+            font-size: 0.875rem; /* sm */
+            font-weight: 500;
+            color: #cbd5e0; /* gray-300 */
+            margin-bottom: 0.25rem;
+        }
+        .settings-section input[type="text"],
+        .settings-section input[type="number"],
+        .settings-section input[type="password"],
+        .settings-section select {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .settings-section input[type="text"]::placeholder,
+        .settings-section input[type="number"]::placeholder,
+        .settings-section input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .settings-section input[type="text"]:focus,
+        .settings-section input[type="number"]:focus,
+        .settings-section input[type="password"]:focus,
+        .settings-section select:focus {
+            border-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5); /* ring-2 blue-400 */
+        }
+        .settings-section select {
+            cursor: pointer;
+        }
+        .settings-section select option {
+            background-color: #2d3748; /* gray-800 */
+            color: white;
+        }
+        .settings-section input[type="color"] {
+            width: 100%;
+            height: 2.5rem; /* h-10 */
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            outline: none;
+            cursor: pointer;
+        }
+        .settings-section input[type="color"]:focus-visible {
+            outline: 2px solid #60A5FA;
+            outline-offset: 2px;
+            border-radius: 0.5rem;
+        }
+        .settings-section .text-xs {
+            font-size: 0.75rem;
+            color: #a0aec0; /* gray-400 */
+            margin-top: 0.25rem;
+        }
+
+        /* Generate PDF Button */
+        .generate-button-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        #generate-pdf-button {
+            width: 100%;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px; /* full */
+            font-size: 1.125rem; /* lg */
+            font-weight: 700;
+            background-color: #10b981; /* green-500 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            outline: none;
+        }
+        #generate-pdf-button:hover {
+            background-color: #059669; /* green-600 */
+            transform: scale(1.05);
+        }
+        #generate-pdf-button:focus-visible {
+            outline: 2px solid #34d399; /* green-400 */
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        #generate-pdf-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #generate-pdf-button i {
+            margin-right: 0.5rem;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            #generate-pdf-button {
+                width: auto;
+            }
+        }
+
+        /* Download Section */
+        #download-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        #download-section h3 {
+            font-size: 1.5rem; /* 2xl */
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        #download-pdf-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            font-weight: 700;
+            border-radius: 9999px; /* full */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            outline: none;
+        }
+        #download-pdf-link:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: scale(1.05);
+        }
+        #download-pdf-link:focus-visible {
+            outline: 2px solid #60a5fa; /* blue-400 */
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        #download-pdf-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-700 to-purple-900 text-gray-100 flex flex-col items-center p-4">
 
     <!-- Main Container -->
-    <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-2xl p-6 md:p-8 max-w-4xl w-full border border-white border-opacity-20">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-6 text-white drop-shadow-lg">
+    <div class="main-container">
+        <h1>
             Advanced PDF Creator
         </h1>
-        <p class="text-center text-gray-200 mb-8 text-lg">Generate PDFs from multiple images, text, and customize every detail.</p>
+        <p>Generate PDFs from multiple images, text, and customize every detail.</p>
 
         <!-- Loading Indicator & Progress Bar -->
-        <div id="loading-indicator" class="hidden flex flex-col items-center p-4 bg-blue-600 bg-opacity-80 rounded-lg mb-6 text-white font-semibold">
+        <div id="loading-indicator" class="hidden">
             <div class="flex items-center mb-2">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span id="loading-text">Processing files...</span>
             </div>
-            <div class="w-full bg-blue-200 rounded-full h-2.5">
-                <div id="progress-bar" class="bg-blue-800 h-2.5 rounded-full" style="width: 0%"></div>
+            <div class="progress-bar-container">
+                <div id="progress-bar" style="width: 0%"></div>
             </div>
         </div>
 
         <!-- Error Message Display -->
-        <div id="error-message-container" class="hidden bg-red-500 bg-opacity-20 border border-red-400 text-red-200 p-4 rounded-lg mb-6 text-center">
+        <div id="error-message-container" class="hidden">
             <p class="font-semibold">Error:</p>
             <p id="error-message-text"></p>
         </div>
 
         <!-- File Upload Section -->
-        <div class="mb-6">
-            <label for="file-upload" class="block text-lg font-semibold mb-2 text-white text-opacity-90">
+        <div class="mb-6 file-upload-section">
+            <label for="file-upload">
                 1. Upload Files (Max 50 files - JPG, PNG, GIF, TXT):
             </label>
-            <div id="drop-area" class="drag-area p-6 rounded-lg text-center cursor-pointer hover:border-blue-400 transition duration-200">
+            <div id="drop-area" class="drag-area">
                 <input type="file" id="file-upload" multiple accept="image/png, image/jpeg, image/gif, text/plain" class="hidden">
-                <p class="text-gray-300 text-lg mb-2"><i class="fas fa-cloud-upload-alt text-3xl mb-2"></i></p>
-                <p class="text-gray-300 text-lg mb-2">Drag & Drop files here, or <span class="text-blue-400 font-bold underline">Click to Browse</span></p>
-                <p class="text-sm text-gray-400">Supported: Images (JPG, PNG, GIF), Text (.TXT)</p>
-                <p class="text-sm text-red-300 mt-2">Note: DOCX/PPTX/XLSX conversion is not supported client-side.</p>
+                <p><i class="fas fa-cloud-upload-alt"></i></p>
+                <p>Drag & Drop files here, or <span>Click to Browse</span></p>
+                <p class="note">Supported: Images (JPG, PNG, GIF), Text (.TXT)</p>
+                <p class="note error-note">Note: DOCX/PPTX/XLSX conversion is not supported client-side.</p>
             </div>
         </div>
 
         <!-- Uploaded Files List & Reordering -->
         <div id="uploaded-files-container" class="mt-6 mb-8 hidden">
-            <h3 class="text-2xl font-bold mb-4 text-white drop-shadow-md">
+            <h3>
                 2. Arrange Pages & Edit
             </h3>
-            <div id="uploaded-files-list" class="space-y-4 bg-white bg-opacity-5 p-4 rounded-lg border border-white border-opacity-10">
+            <div id="uploaded-files-list">
                 <!-- Uploaded files will be listed here -->
             </div>
         </div>
 
         <!-- PDF Settings Section -->
-        <div class="mt-8 p-6 bg-white bg-opacity-10 rounded-xl shadow-inner border border-white border-opacity-20">
-            <h3 class="text-2xl font-bold mb-4 text-white drop-shadow-md">PDF Settings & Customization</h3>
+        <div class="settings-section">
+            <h3>PDF Settings & Customization</h3>
 
             <!-- Page Size & Orientation -->
             <div class="mb-6">
-                <h4 class="text-xl font-semibold mb-3 text-blue-300">Page Layout</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4>Page Layout</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2">
                     <div>
-                        <label for="page-size" class="block text-sm font-medium text-gray-300 mb-1">Page Size:</label>
-                        <select id="page-size"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
-                            <option value="A4" class="bg-gray-800">A4 (210 x 297 mm)</option>
-                            <option value="Letter" class="bg-gray-800">Letter (8.5 x 11 in)</option>
-                            <option value="Legal" class="bg-gray-800">Legal (8.5 x 14 in)</option>
+                        <label for="page-size">Page Size:</label>
+                        <select id="page-size">
+                            <option value="A4">A4 (210 x 297 mm)</option>
+                            <option value="Letter">Letter (8.5 x 11 in)</option>
+                            <option value="Legal">Legal (8.5 x 14 in)</option>
                         </select>
                     </div>
                     <div>
-                        <label for="page-orientation" class="block text-sm font-medium text-gray-300 mb-1">Orientation:</label>
-                        <select id="page-orientation"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
-                            <option value="portrait" class="bg-gray-800">Portrait</option>
-                            <option value="landscape" class="bg-gray-800">Landscape</option>
+                        <label for="page-orientation">Orientation:</label>
+                        <select id="page-orientation">
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
                         </select>
                     </div>
                 </div>
@@ -149,121 +513,100 @@
 
             <!-- Text Overlay -->
             <div class="mb-6">
-                <h4 class="text-xl font-semibold mb-3 text-blue-300">Text Overlay (Per Page)</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4>Text Overlay (Per Page)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2">
                     <div class="md:col-span-2">
-                        <label for="overlay-text" class="block text-sm font-medium text-gray-300 mb-1">Overlay Text:</label>
-                        <input type="text" id="overlay-text" placeholder="Text to appear on each page"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="overlay-text">Overlay Text:</label>
+                        <input type="text" id="overlay-text" placeholder="Text to appear on each page">
                     </div>
                     <div>
-                        <label for="overlay-font-size" class="block text-sm font-medium text-gray-300 mb-1">Font Size:</label>
-                        <input type="number" id="overlay-font-size" value="24" min="8" max="100"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="overlay-font-size">Font Size:</label>
+                        <input type="number" id="overlay-font-size" value="24" min="8" max="100">
                     </div>
                     <div>
-                        <label for="overlay-x-pos" class="block text-sm font-medium text-gray-300 mb-1">X Position (from left):</label>
-                        <input type="number" id="overlay-x-pos" value="50"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="overlay-x-pos">X Position (from left):</label>
+                        <input type="number" id="overlay-x-pos" value="50">
                     </div>
                     <div>
-                        <label for="overlay-y-pos" class="block text-sm font-medium text-gray-300 mb-1">Y Position (from bottom):</label>
-                        <input type="number" id="overlay-y-pos" value="50"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="overlay-y-pos">Y Position (from bottom):</label>
+                        <input type="number" id="overlay-y-pos" value="50">
                     </div>
                     <div>
-                        <label for="overlay-color" class="block text-sm font-medium text-gray-300 mb-1">Text Color:</label>
-                        <input type="color" id="overlay-color" value="#FFFFFF"
-                            class="w-full h-10 p-1 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
+                        <label for="overlay-color">Text Color:</label>
+                        <input type="color" id="overlay-color" value="#FFFFFF">
                     </div>
                 </div>
             </div>
 
             <!-- Meta Tags -->
             <div class="mb-6">
-                <h4 class="text-xl font-semibold mb-3 text-blue-300">Meta Tags</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4>Meta Tags</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2">
                     <div>
-                        <label for="pdf-title" class="block text-sm font-medium text-gray-300 mb-1">Title:</label>
-                        <input type="text" id="pdf-title" placeholder="Document Title"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="pdf-title">Title:</label>
+                        <input type="text" id="pdf-title" placeholder="Document Title">
                     </div>
                     <div>
-                        <label for="pdf-author" class="block text-sm font-medium text-gray-300 mb-1">Author:</label>
-                        <input type="text" id="pdf-author" placeholder="Document Author"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="pdf-author">Author:</label>
+                        <input type="text" id="pdf-author" placeholder="Document Author">
                     </div>
                     <div class="md:col-span-2">
-                        <label for="pdf-keywords" class="block text-sm font-medium text-gray-300 mb-1">Keywords (comma-separated):</label>
-                        <input type="text" id="pdf-keywords" placeholder="keywords, separated, by, comma"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="pdf-keywords">Keywords (comma-separated):</label>
+                        <input type="text" id="pdf-keywords" placeholder="keywords, separated, by, comma">
                     </div>
                 </div>
             </div>
 
             <!-- PDF Version & Encryption -->
             <div class="mb-6">
-                <h4 class="text-xl font-semibold mb-3 text-blue-300">Version & Security</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4>Version & Security</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2">
                     <div>
-                        <label for="pdf-version" class="block text-sm font-medium text-gray-300 mb-1">PDF Version:</label>
-                        <select id="pdf-version"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer">
-                            <option value="1.7" class="bg-gray-800">1.7 (Default)</option>
-                            <option value="1.4" class="bg-gray-800">1.4</option>
-                            <option value="1.5" class="bg-gray-800">1.5</option>
-                            <option value="1.6" class="bg-gray-800">1.6</option>
+                        <label for="pdf-version">PDF Version:</label>
+                        <select id="pdf-version">
+                            <option value="1.7">1.7 (Default)</option>
+                            <option value="1.4">1.4</option>
+                            <option value="1.5">1.5</option>
+                            <option value="1.6">1.6</option>
                         </select>
                     </div>
                     <div>
-                        <label for="encryption-password" class="block text-sm font-medium text-gray-300 mb-1">Encryption Password (Optional):</label>
-                        <input type="password" id="encryption-password" placeholder="Leave blank for no encryption"
-                            class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <label for="encryption-password">Encryption Password (Optional):</label>
+                        <input type="password" id="encryption-password" placeholder="Leave blank for no encryption">
                     </div>
                 </div>
             </div>
 
             <!-- Customization: Watermark, Header, Footer -->
             <div>
-                <h4 class="text-xl font-semibold mb-3 text-blue-300">Page Customization</h4>
+                <h4>Page Customization</h4>
                 <div class="mb-4">
-                    <label for="watermark-text" class="block text-sm font-medium text-gray-300 mb-1">Watermark Text (Optional):</label>
-                    <input type="text" id="watermark-text" placeholder="e.g., DRAFT, CONFIDENTIAL"
-                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <label for="watermark-text">Watermark Text (Optional):</label>
+                    <input type="text" id="watermark-text" placeholder="e.g., DRAFT, CONFIDENTIAL">
                 </div>
                 <div class="mb-4">
-                    <label for="header-text" class="block text-sm font-medium text-gray-300 mb-1">Header Text (Optional):</label>
-                    <input type="text" id="header-text" placeholder="e.g., Company Name, Document Title"
-                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <label for="header-text">Header Text (Optional):</label>
+                    <input type="text" id="header-text" placeholder="e.g., Company Name, Document Title">
                 </div>
                 <div>
-                    <label for="footer-text" class="block text-sm font-medium text-gray-300 mb-1">Footer Text (Optional):</label>
-                    <input type="text" id="footer-text" placeholder="e.g., Page [pageNumber] of [pageCount]"
-                        class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <p class="text-xs text-gray-400 mt-1">Use `[pageNumber]` and `[pageCount]` for dynamic page numbering.</p>
+                    <label for="footer-text">Footer Text (Optional):</label>
+                    <input type="text" id="footer-text" placeholder="e.g., Page [pageNumber] of [pageCount]">
+                    <p class="text-xs">Use `[pageNumber]` and `[pageCount]` for dynamic page numbering.</p>
                 </div>
             </div>
         </div>
 
         <!-- Generate PDF Button -->
-        <div class="mt-8 text-center">
-            <button id="generate-pdf-button"
-                class="w-full md:w-auto px-8 py-3 rounded-full text-lg font-bold
-                       bg-green-500 hover:bg-green-600 text-white shadow-lg
-                       transition duration-300 ease-in-out transform hover:scale-105
-                       focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75"
-                disabled>
+        <div class="mt-8 text-center generate-button-container">
+            <button id="generate-pdf-button" disabled>
                 <i class="fas fa-file-export mr-2"></i> Generate PDF
             </button>
         </div>
 
         <!-- Download Link -->
         <div id="download-section" class="mt-8 text-center hidden">
-            <h3 class="text-2xl font-bold mb-4 text-white drop-shadow-md">Download Your PDF</h3>
-            <a id="download-pdf-link" href="#" download="generated-document.pdf"
-                class="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg
-                       transition duration-300 ease-in-out transform hover:scale-105
-                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+            <h3>Download Your PDF</h3>
+            <a id="download-pdf-link" href="#" download="generated-document.pdf">
                 <i class="fas fa-download mr-2"></i> Download PDF
             </a>
         </div>
@@ -487,31 +830,31 @@
             const itemDiv = document.createElement('div');
             itemDiv.id = fileEntry.id;
             itemDiv.draggable = true;
-            itemDiv.classList.add('page-item', 'flex', 'items-center', 'justify-between', 'p-3', 'bg-white', 'bg-opacity-10', 'rounded-lg', 'border', 'border-white', 'border-opacity-20', 'shadow-sm', 'text-gray-200');
+            itemDiv.classList.add('page-item'); /* Removed Tailwind classes */
 
             let previewContent;
             if (fileEntry.type.startsWith('image/')) {
-                previewContent = `<img src="${fileEntry.dataUrl}" alt="Preview of ${fileEntry.file.name}" class="w-16 h-16 object-cover rounded-md mr-4 border border-white border-opacity-30" style="transform: rotate(${fileEntry.rotation}deg);">`;
+                previewContent = `<img src="${fileEntry.dataUrl}" alt="Preview of ${fileEntry.file.name}" style="transform: rotate(${fileEntry.rotation}deg);">`;
             } else if (fileEntry.type === 'text/plain') {
-                previewContent = `<i class="fas fa-file-alt text-4xl text-blue-300 mr-4"></i>`;
+                previewContent = `<i class="fas fa-file-alt"></i>`;
             } else {
-                previewContent = `<i class="fas fa-file text-4xl text-gray-300 mr-4"></i>`;
+                previewContent = `<i class="fas fa-file"></i>`;
             }
 
             itemDiv.innerHTML = `
-                <div class="flex items-center flex-grow">
-                    <i class="fas fa-grip-vertical text-gray-400 mr-3 cursor-grab handle"></i>
+                <div class="flex-items-center flex-grow">
+                    <i class="fas fa-grip-vertical handle"></i>
                     ${previewContent}
-                    <span class="flex-grow truncate text-sm md:text-base">${fileEntry.file.name}</span>
+                    <span>${fileEntry.file.name}</span>
                 </div>
-                <div class="flex items-center space-x-2 ml-4">
+                <div class="actions">
                     ${fileEntry.type.startsWith('image/') ? `
-                    <button class="rotate-btn p-2 rounded-full bg-blue-500 hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400" title="Rotate Image">
-                        <i class="fas fa-sync-alt text-white text-sm"></i>
+                    <button class="rotate-btn" title="Rotate Image">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                     ` : ''}
-                    <button class="remove-btn p-2 rounded-full bg-red-500 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400" title="Remove File">
-                        <i class="fas fa-trash-alt text-white text-sm"></i>
+                    <button class="remove-btn" title="Remove File">
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             `;
