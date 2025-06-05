@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom QR Code Generator</title>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text color */
+        }
+
+        .main-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 1.5rem;
+            max-width: 40rem; /* Adjusted max-width for QR tool */
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        h1 {
+            font-size: 2.25rem; /* 4xl */
+            font-weight: 800; /* extabold */
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-title {
+            font-size: 1.5rem; /* 2xl */
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem; /* sm */
+            font-weight: 500;
+            color: #cbd5e0; /* gray-300 */
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="color"],
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5); /* ring-2 blue-400 */
+        }
+        input[type="color"] {
+            height: 2.5rem;
+            padding: 0.25rem;
+            cursor: pointer;
+        }
+        input[type="color"]:focus-visible {
+            outline: 2px solid #60A5FA;
+            outline-offset: 2px;
+            border-radius: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* full */
+            font-size: 1.125rem; /* lg */
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            outline: none;
+            cursor: pointer;
+            border: none;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .button:focus-visible {
+            outline: 2px solid;
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .button i {
+            margin-right: 0.5rem;
+        }
+
+        .button.primary {
+            background-color: #10b981; /* green-500 */
+        }
+        .button.primary:hover {
+            background-color: #059669; /* green-600 */
+        }
+        .button.primary:focus-visible {
+            outline-color: #34d399; /* green-400 */
+        }
+
+        .button.secondary {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .button.secondary:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .button.secondary:focus-visible {
+            outline-color: #60a5fa; /* blue-400 */
+        }
+
+        #qr-code-canvas {
+            display: block;
+            margin: 2rem auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            background-color: white; /* QR code will draw on this white background */
+        }
+
+        #download-section {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+
+        .loading-text {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+            height: 1.25rem;
+            width: 1.25rem;
+            color: white;
+        }
+        
+        /* Radio button styling */
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background-color 0.2s ease;
+        }
+        .radio-group label:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 0.5rem;
+            appearance: none; /* Hide default radio button */
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #60a5fa; /* blue-400 */
+            border-radius: 50%;
+            background-color: transparent;
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"]:checked {
+            background-color: #60a5fa; /* blue-400 */
+            border-color: #60a5fa;
+        }
+        .radio-group input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: #1a202c; /* Inner dot color */
+        }
+        .radio-group input[type="radio"]:focus-visible {
+            outline: 2px solid #60A5FA;
+            outline-offset: 2px;
+            border-radius: 50%;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .main-container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+            .section-title {
+                font-size: 1.25rem;
+            }
+            .input-group {
+                margin-bottom: 0.75rem;
+            }
+            .grid {
+                grid-template-columns: 1fr; /* Stack columns on small screens */
+            }
+            .button {
+                width: 100%;
+                font-size: 1rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-700 to-purple-900">
+
+    <div class="main-container">
+        <h1>Custom QR Code Generator</h1>
+
+        <!-- Type Selection -->
+        <div class="mb-6">
+            <h2 class="section-title">1. Select QR Code Type</h2>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="qr-type" value="text" checked> Text
+                </label>
+                <label>
+                    <input type="radio" name="qr-type" value="url"> URL
+                </label>
+                <label>
+                    <input type="radio" name="qr-type" value="contact"> Contact Info
+                </label>
+            </div>
+        </div>
+
+        <!-- Input Data Section -->
+        <div class="mb-6">
+            <h2 class="section-title">2. Enter Data</h2>
+            <div id="text-input" class="input-group">
+                <label for="text-data">Text Content:</label>
+                <textarea id="text-data" rows="4" placeholder="Enter any text you want to encode in the QR code."></textarea>
+            </div>
+
+            <div id="url-input" class="input-group hidden">
+                <label for="url-data">URL:</label>
+                <input type="text" id="url-data" placeholder="e.g., https://www.example.com">
+            </div>
+
+            <div id="contact-input" class="input-group hidden">
+                <label for="contact-name">Name:</label>
+                <input type="text" id="contact-name" placeholder="John Doe">
+
+                <label for="contact-phone">Phone:</label>
+                <input type="text" id="contact-phone" placeholder="+1234567890">
+
+                <label for="contact-email">Email:</label>
+                <input type="text" id="contact-email" placeholder="john.doe@example.com">
+            </div>
+        </div>
+
+        <!-- Customization Options -->
+        <div class="mb-8">
+            <h2 class="section-title">3. Customize (Optional)</h2>
+            <div class="grid">
+                <div>
+                    <label for="qr-size">Size (pixels):</label>
+                    <input type="number" id="qr-size" value="256" min="64" max="1024">
+                </div>
+                <div>
+                    <label for="qr-color">QR Code Color:</label>
+                    <input type="color" id="qr-color" value="#000000">
+                </div>
+                <div>
+                    <label for="qr-background">Background Color:</label>
+                    <input type="color" id="qr-background" value="#FFFFFF">
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div class="text-center">
+            <button id="generate-qr-button" class="button primary w-full">
+                <span id="generate-button-text"><i class="fas fa-qrcode"></i> Generate QR Code</span>
+                <span id="loading-spinner" class="hidden loading-spinner"></span>
+            </button>
+        </div>
+
+        <!-- QR Code Display Area -->
+        <canvas id="qr-code-canvas" width="256" height="256"></canvas>
+
+        <!-- Download Section -->
+        <div id="download-section" class="hidden">
+            <button id="download-qr-button" class="button secondary w-full">
+                <i class="fas fa-download"></i> Download QR Code
+            </button>
+        </div>
+    </div>
+
+    <!-- qrious.js CDN for QR Code generation -->
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script>
+        // --- DOM Element References ---
+        const qrTypeRadios = document.querySelectorAll('input[name="qr-type"]');
+        const textInputDiv = document.getElementById('text-input');
+        const urlInputDiv = document.getElementById('url-input');
+        const contactInputDiv = document.getElementById('contact-input');
+
+        const textDataInput = document.getElementById('text-data');
+        const urlDataInput = document.getElementById('url-data');
+        const contactNameInput = document.getElementById('contact-name');
+        const contactPhoneInput = document.getElementById('contact-phone');
+        const contactEmailInput = document.getElementById('contact-email');
+
+        const qrSizeInput = document.getElementById('qr-size');
+        const qrColorInput = document.getElementById('qr-color');
+        const qrBackgroundInput = document.getElementById('qr-background');
+
+        const generateQrButton = document.getElementById('generate-qr-button');
+        const generateButtonText = document.getElementById('generate-button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        const qrCodeCanvas = document.getElementById('qr-code-canvas');
+        const downloadSection = document.getElementById('download-section');
+        const downloadQrButton = document.getElementById('download-qr-button');
+
+        // --- Global State Variables ---
+        let currentQrType = 'text'; // Default selected type
+
+        // --- Utility Functions ---
+
+        /**
+         * Shows an HTML element.
+         * @param {HTMLElement} element The element to show.
+         */
+        function showElement(element) {
+            element.classList.remove('hidden');
+        }
+
+        /**
+         * Hides an HTML element.
+         * @param {HTMLElement} element The element to hide.
+         */
+        function hideElement(element) {
+            element.classList.add('hidden');
+        }
+
+        /**
+         * Sets the loading state of the generate button.
+         * @param {boolean} isLoading True to show loading, false otherwise.
+         */
+        function setLoadingState(isLoading) {
+            generateQrButton.disabled = isLoading;
+            if (isLoading) {
+                generateButtonText.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+            } else {
+                generateButtonText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // --- Event Handlers ---
+
+        /**
+         * Handles the change event for QR code type selection (radio buttons).
+         */
+        function handleQrTypeChange() {
+            currentQrType = document.querySelector('input[name="qr-type"]:checked').value;
+
+            // Hide all input groups
+            hideElement(textInputDiv);
+            hideElement(urlInputDiv);
+            hideElement(contactInputDiv);
+            hideElement(downloadSection); // Hide download button when input type changes
+
+            // Show the relevant input group based on selection
+            if (currentQrType === 'text') {
+                showElement(textInputDiv);
+            } else if (currentQrType === 'url') {
+                showElement(urlInputDiv);
+            } else if (currentQrType === 'contact') {
+                showElement(contactInputDiv);
+            }
+        }
+
+        /**
+         * Constructs the QR code data string based on the selected type and inputs.
+         * @returns {string} The data string for the QR code.
+         */
+        function getQrData() {
+            if (currentQrType === 'text') {
+                return textDataInput.value.trim();
+            } else if (currentQrType === 'url') {
+                let url = urlDataInput.value.trim();
+                // Basic URL validation: prepend 'https://' if no protocol
+                if (url && !/^https?:\/\//i.test(url)) {
+                    url = 'https://' + url;
+                }
+                return url;
+            } else if (currentQrType === 'contact') {
+                const name = contactNameInput.value.trim();
+                const phone = contactPhoneInput.value.trim();
+                const email = contactEmailInput.value.trim();
+
+                // VCard format for contact info
+                let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+                if (name) vcard += `FN:${name}\n`;
+                if (phone) vcard += `TEL:${phone}\n`;
+                if (email) vcard += `EMAIL:${email}\n`;
+                vcard += 'END:VCARD';
+                return vcard;
+            }
+            return '';
+        }
+
+        /**
+         * Generates the QR code and displays it on the canvas.
+         */
+        function generateQrCode() {
+            const data = getQrData();
+            if (!data) {
+                alert('Please enter data to generate QR code.'); // Using alert for simple feedback as per instructions
+                return;
+            }
+
+            setLoadingState(true);
+            hideElement(downloadSection); // Hide previous download button
+
+            const size = parseInt(qrSizeInput.value);
+            const foreground = qrColorInput.value;
+            const background = qrBackgroundInput.value;
+
+            try {
+                // Initialize QRious instance
+                new QRious({
+                    element: qrCodeCanvas,
+                    value: data,
+                    size: size,
+                    foreground: foreground,
+                    background: background,
+                });
+                showElement(downloadSection); // Show download button
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                alert('Failed to generate QR code. Please check your inputs.');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        /**
+         * Handles downloading the generated QR code as a PNG image.
+         */
+        function downloadQrCode() {
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.download = 'qrcode.png'; // Set default filename
+            link.href = qrCodeCanvas.toDataURL('image/png'); // Get QR code as PNG Data URL
+            document.body.appendChild(link); // Append to body (required for Firefox)
+            link.click(); // Programmatically click the link to trigger download
+            document.body.removeChild(link); // Clean up the temporary link
+        }
+
+        // --- Initial Setup and Event Listener Assignments ---
+        window.onload = () => {
+            // Attach event listeners for QR type selection
+            qrTypeRadios.forEach(radio => {
+                radio.addEventListener('change', handleQrTypeChange);
+            });
+
+            // Initial call to set up the correct input section
+            handleQrTypeChange();
+
+            // Attach event listener for the generate button
+            generateQrButton.addEventListener('click', generateQrCode);
+
+            // Attach event listener for the download button
+            downloadQrButton.addEventListener('click', downloadQrCode);
+
+            // Generate a default QR code on load (e.g., for "Text" with empty content)
+            generateQrCode();
+        };
+    </script>
+</body>
+</html>
