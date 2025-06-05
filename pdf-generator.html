@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced PDF Creator Tool - Generate from Multiple Files, Images, Text (Unstyled)</title>
-    <!-- Tailwind CSS CDN REMOVED: To restore styling, you would need to compile Tailwind CSS locally
-         or write custom CSS rules to replace the utility classes used in the HTML. -->
+    <title>Advanced PDF Creator Tool - Generate PDF from Images</title>
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -198,12 +196,7 @@
             margin-right: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .page-item i.fa-file-alt, .page-item i.fa-file {
-            font-size: 2.5rem; /* 4xl */
-            margin-right: 1rem;
-        }
-        .page-item i.fa-file-alt { color: #60a5fa; /* blue-300 */ }
-        .page-item i.fa-file { color: #a0aec0; /* gray-300 */ }
+        /* Removed text file icon styles as text files are no longer supported */
 
         .page-item span {
             flex-grow: 1;
@@ -437,9 +430,9 @@
     <!-- Main Container -->
     <div class="main-container">
         <h1>
-            Advanced PDF Creator
+            Image to PDF Creator
         </h1>
-        <p>Generate PDFs from multiple images, text, and customize every detail.</p>
+        <p>Combine multiple images into a single PDF document with custom settings.</p>
 
         <!-- Loading Indicator & Progress Bar -->
         <div id="loading-indicator" class="hidden">
@@ -464,14 +457,13 @@
         <!-- File Upload Section -->
         <div class="mb-6 file-upload-section">
             <label for="file-upload">
-                1. Upload Files (Max 50 files - JPG, PNG, GIF, TXT):
+                1. Upload Images (Max 20 files - JPG, PNG, GIF):
             </label>
             <div id="drop-area" class="drag-area">
-                <input type="file" id="file-upload" multiple accept="image/png, image/jpeg, image/gif, text/plain" class="hidden">
+                <input type="file" id="file-upload" multiple accept="image/png, image/jpeg, image/gif" class="hidden">
                 <p><i class="fas fa-cloud-upload-alt"></i></p>
-                <p>Drag & Drop files here, or <span>Click to Browse</span></p>
-                <p class="note">Supported: Images (JPG, PNG, GIF), Text (.TXT)</p>
-                <p class="note error-note">Note: DOCX/PPTX/XLSX conversion is not supported client-side.</p>
+                <p>Drag & Drop images here, or <span>Click to Browse</span></p>
+                <p class="note">Supported: JPG, PNG, GIF</p>
             </div>
         </div>
 
@@ -665,7 +657,7 @@
         // --- Global State Variables ---
         // Array to store uploaded files, their data, and properties
         let uploadedFiles = []; // { id: string, file: File, dataUrl: string, type: string, rotation: number, element: HTMLElement }
-        const MAX_FILES = 50;
+        const MAX_FILES = 20; // Changed max files to 20
         let dragSrcEl = null; // For drag-and-drop reordering
 
         // --- Utility Functions ---
@@ -766,9 +758,14 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
 
-                // Skip unsupported file types
-                if (!['image/png', 'image/jpeg', 'image/gif', 'text/plain'].includes(file.type)) {
-                    displayError(`Unsupported file type: ${file.name}. Only JPG, PNG, GIF, and TXT are supported.`);
+                // Skip non-image file types (TXT, DOCX, etc. are not supported for this version)
+                if (!file.type.startsWith('image/')) {
+                    displayError(`Unsupported file type: ${file.name}. Only image files (JPG, PNG, GIF) are supported.`);
+                    continue;
+                }
+                 // Specific check for image types
+                if (!['image/png', 'image/jpeg', 'image/gif'].includes(file.type)) {
+                    displayError(`Unsupported image format: ${file.name}. Only JPG, PNG, GIF are supported.`);
                     continue;
                 }
 
@@ -830,16 +827,11 @@
             const itemDiv = document.createElement('div');
             itemDiv.id = fileEntry.id;
             itemDiv.draggable = true;
-            itemDiv.classList.add('page-item'); /* Removed Tailwind classes */
+            // Apply basic CSS classes for styling from the embedded style block
+            itemDiv.classList.add('page-item');
 
-            let previewContent;
-            if (fileEntry.type.startsWith('image/')) {
-                previewContent = `<img src="${fileEntry.dataUrl}" alt="Preview of ${fileEntry.file.name}" style="transform: rotate(${fileEntry.rotation}deg);">`;
-            } else if (fileEntry.type === 'text/plain') {
-                previewContent = `<i class="fas fa-file-alt"></i>`;
-            } else {
-                previewContent = `<i class="fas fa-file"></i>`;
-            }
+            // Preview content for images only
+            const previewContent = `<img src="${fileEntry.dataUrl}" alt="Preview of ${fileEntry.file.name}" style="transform: rotate(${fileEntry.rotation}deg);">`;
 
             itemDiv.innerHTML = `
                 <div class="flex-items-center flex-grow">
@@ -848,11 +840,9 @@
                     <span>${fileEntry.file.name}</span>
                 </div>
                 <div class="actions">
-                    ${fileEntry.type.startsWith('image/') ? `
                     <button class="rotate-btn" title="Rotate Image">
                         <i class="fas fa-sync-alt"></i>
                     </button>
-                    ` : ''}
                     <button class="remove-btn" title="Remove File">
                         <i class="fas fa-trash-alt"></i>
                     </button>
@@ -987,6 +977,12 @@
             showLoading('Starting PDF generation...');
 
             try {
+                if (uploadedFiles.length === 0) {
+                    displayError('Please upload at least one image file to generate PDF.');
+                    hideLoading();
+                    return;
+                }
+
                 // Determine page size and orientation
                 const pageSize = PageSizes[pageSizeSelect.value];
                 let pageWidth = pageSize[0];
@@ -1014,7 +1010,7 @@
                 // Embed standard fonts
                 const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
                 const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-                const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+                // Removed italicFont as it's not used in current implementation
 
                 const pageMargin = 50; // Margin from edges
 
@@ -1027,108 +1023,64 @@
                     const contentWidth = page.getWidth() - 2 * pageMargin;
                     const contentHeight = page.getHeight() - 2 * pageMargin;
 
-                    // --- Add Content Based on File Type ---
-                    if (fileEntry.type.startsWith('image/')) {
-                        let image;
-                        let imageBytes;
+                    // --- Add Image Content ---
+                    let image;
+                    let imageBytes;
 
-                        // Re-draw image on a hidden canvas to apply rotation before embedding
-                        const img = new Image();
-                        img.src = fileEntry.dataUrl;
-                        await new Promise(resolve => img.onload = resolve);
+                    // Re-draw image on a hidden canvas to apply rotation before embedding
+                    const img = new Image();
+                    img.src = fileEntry.dataUrl;
+                    await new Promise(resolve => img.onload = resolve);
 
-                        hiddenCanvas.width = img.width;
-                        hiddenCanvas.height = img.height;
-                        hiddenCtx.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+                    hiddenCanvas.width = img.width;
+                    hiddenCanvas.height = img.height;
+                    hiddenCtx.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
 
-                        // Apply rotation
-                        if (fileEntry.rotation !== 0) {
-                            hiddenCtx.save();
-                            hiddenCtx.translate(hiddenCanvas.width / 2, hiddenCanvas.height / 2);
-                            hiddenCtx.rotate(fileEntry.rotation * Math.PI / 180);
-                            hiddenCtx.drawImage(img, -img.width / 2, -img.height / 2);
-                            hiddenCtx.restore();
-                        } else {
-                            hiddenCtx.drawImage(img, 0, 0);
-                        }
-
-                        // Get image data from canvas
-                        const processedDataUrl = hiddenCanvas.toDataURL(fileEntry.type === 'image/gif' ? 'image/png' : fileEntry.type); // Convert GIF to PNG for static embed
-                        imageBytes = await fetch(processedDataUrl).then(res => res.arrayBuffer());
-
-                        // Embed image based on type
-                        if (fileEntry.type === 'image/png' || fileEntry.type === 'image/gif') {
-                            image = await pdfDoc.embedPng(imageBytes);
-                        } else if (fileEntry.type === 'image/jpeg') {
-                            image = await pdfDoc.embedJpg(imageBytes);
-                        }
-
-                        // Scale image to fit page, maintaining aspect ratio
-                        const imageRatio = image.width / image.height;
-                        let finalImageWidth = contentWidth;
-                        let finalImageHeight = contentWidth / imageRatio;
-
-                        if (finalImageHeight > contentHeight) {
-                            finalImageHeight = contentHeight;
-                            finalImageWidth = contentHeight * imageRatio;
-                        }
-
-                        // Center image on the page
-                        const x = pageMargin + (contentWidth - finalImageWidth) / 2;
-                        const y = pageMargin + (contentHeight - finalImageHeight) / 2;
-
-                        page.drawImage(image, {
-                            x: x,
-                            y: y,
-                            width: finalImageWidth,
-                            height: finalImageHeight,
-                        });
-
-                    } else if (fileEntry.type === 'text/plain') {
-                        const textContent = await fileEntry.file.text(); // Read text file content
-                        const fontSize = 12;
-                        const lineHeight = fontSize * 1.5;
-                        const textColor = rgb(0.9, 0.9, 0.9); // Light gray for text
-
-                        const words = textContent.split(' ');
-                        let currentLine = '';
-                        let yPos = page.getHeight() - pageMargin; // Start from top margin
-
-                        for (let j = 0; j < words.length; j++) {
-                            const word = words[j];
-                            const testLine = currentLine === '' ? word : `${currentLine} ${word}`;
-                            const textWidth = font.widthOfTextAtSize(testLine, fontSize);
-
-                            if (textWidth < contentWidth) {
-                                currentLine = testLine;
-                            } else {
-                                if (yPos < pageMargin + lineHeight) { // Check if new page is needed
-                                    page.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
-                                    page = pdfDoc.addPage([pageWidth, pageHeight]); // Add new page
-                                    yPos = page.getHeight() - pageMargin;
-                                    // Redraw header/footer, watermark, and text overlay on new page
-                                    await drawHeaderFooter(page, pdfDoc.getPages().length, uploadedFiles.length, boldFont, pageMargin, contentWidth);
-                                    await drawWatermark(page, watermarkTextInput.value, boldFont);
-                                    await drawTextOverlay(page, font);
-                                }
-                                page.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
-                                yPos -= lineHeight;
-                                currentLine = word;
-                            }
-                        }
-                        if (currentLine !== '') { // Draw any remaining text
-                            if (yPos < pageMargin + lineHeight) {
-                                page = pdfDoc.addPage([pageWidth, pageHeight]);
-                                yPos = page.getHeight() - pageMargin;
-                                await drawHeaderFooter(page, pdfDoc.getPages().length, uploadedFiles.length, boldFont, pageMargin, contentWidth);
-                                await drawWatermark(page, watermarkTextInput.value, boldFont);
-                                await drawTextOverlay(page, font);
-                            }
-                            page.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
-                        }
+                    // Apply rotation
+                    if (fileEntry.rotation !== 0) {
+                        hiddenCtx.save();
+                        hiddenCtx.translate(hiddenCanvas.width / 2, hiddenCanvas.height / 2);
+                        hiddenCtx.rotate(fileEntry.rotation * Math.PI / 180);
+                        hiddenCtx.drawImage(img, -img.width / 2, -img.height / 2);
+                        hiddenCtx.restore();
+                    } else {
+                        hiddenCtx.drawImage(img, 0, 0);
                     }
+
+                    // Get image data from canvas
+                    // Convert GIF to PNG for static embed as pdf-lib embeds GIFs as first frame.
+                    const processedDataUrl = hiddenCanvas.toDataURL(fileEntry.type === 'image/gif' ? 'image/png' : fileEntry.type);
+                    imageBytes = await fetch(processedDataUrl).then(res => res.arrayBuffer());
+
+                    // Embed image based on type
+                    if (fileEntry.type === 'image/png' || fileEntry.type === 'image/gif') {
+                        image = await pdfDoc.embedPng(imageBytes);
+                    } else if (fileEntry.type === 'image/jpeg') {
+                        image = await pdfDoc.embedJpg(imageBytes);
+                    }
+
+                    // Scale image to fit page, maintaining aspect ratio
+                    const imageRatio = image.width / image.height;
+                    let finalImageWidth = contentWidth;
+                    let finalImageHeight = contentWidth / imageRatio;
+
+                    if (finalImageHeight > contentHeight) {
+                        finalImageHeight = contentHeight;
+                        finalImageWidth = contentHeight * imageRatio;
+                    }
+
+                    // Center image on the page
+                    const x = pageMargin + (contentWidth - finalImageWidth) / 2;
+                    const y = pageMargin + (contentHeight - finalImageHeight) / 2;
+
+                    page.drawImage(image, {
+                        x: x,
+                        y: y,
+                        width: finalImageWidth,
+                        height: finalImageHeight,
+                    });
+
                     // Add text overlay, header, footer, watermark after content is drawn for each page
-                    // This ensures they are on top of content and on every page.
                     await drawTextOverlay(page, font);
                     await drawHeaderFooter(page, i + 1, uploadedFiles.length, boldFont, pageMargin, contentWidth);
                     await drawWatermark(page, watermarkTextInput.value, boldFont);
