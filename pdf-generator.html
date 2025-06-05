@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced PDF Creator Tool - Generate PDF from Images</title>
+    <title>Image to PDF Creator</title>
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -248,101 +248,6 @@
             outline-color: #f87171; /* red-400 */
         }
 
-        /* PDF Settings Section */
-        .settings-section {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .settings-section h3 {
-            font-size: 1.5rem; /* 2xl */
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .settings-section h4 {
-            font-size: 1.25rem; /* xl */
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: #93c5fd; /* blue-300 */
-        }
-        .settings-section .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        @media (min-width: 768px) { /* md breakpoint */
-            .settings-section .grid-cols-1.md\:grid-cols-2 {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            .settings-section .md\:col-span-2 {
-                grid-column: span 2 / span 2;
-            }
-        }
-        .settings-section label {
-            display: block;
-            font-size: 0.875rem; /* sm */
-            font-weight: 500;
-            color: #cbd5e0; /* gray-300 */
-            margin-bottom: 0.25rem;
-        }
-        .settings-section input[type="text"],
-        .settings-section input[type="number"],
-        .settings-section input[type="password"],
-        .settings-section select {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .settings-section input[type="text"]::placeholder,
-        .settings-section input[type="number"]::placeholder,
-        .settings-section input[type="password"]::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        .settings-section input[type="text"]:focus,
-        .settings-section input[type="number"]:focus,
-        .settings-section input[type="password"]:focus,
-        .settings-section select:focus {
-            border-color: #60a5fa; /* blue-400 */
-            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5); /* ring-2 blue-400 */
-        }
-        .settings-section select {
-            cursor: pointer;
-        }
-        .settings-section select option {
-            background-color: #2d3748; /* gray-800 */
-            color: white;
-        }
-        .settings-section input[type="color"] {
-            width: 100%;
-            height: 2.5rem; /* h-10 */
-            padding: 0.25rem;
-            border-radius: 0.5rem;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            outline: none;
-            cursor: pointer;
-        }
-        .settings-section input[type="color"]:focus-visible {
-            outline: 2px solid #60A5FA;
-            outline-offset: 2px;
-            border-radius: 0.5rem;
-        }
-        .settings-section .text-xs {
-            font-size: 0.75rem;
-            color: #a0aec0; /* gray-400 */
-            margin-top: 0.25rem;
-        }
-
         /* Generate PDF Button */
         .generate-button-container {
             margin-top: 2rem;
@@ -477,117 +382,6 @@
             </div>
         </div>
 
-        <!-- PDF Settings Section -->
-        <div class="settings-section">
-            <h3>PDF Settings & Customization</h3>
-
-            <!-- Page Size & Orientation -->
-            <div class="mb-6">
-                <h4>Page Layout</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div>
-                        <label for="page-size">Page Size:</label>
-                        <select id="page-size">
-                            <option value="A4">A4 (210 x 297 mm)</option>
-                            <option value="Letter">Letter (8.5 x 11 in)</option>
-                            <option value="Legal">Legal (8.5 x 14 in)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="page-orientation">Orientation:</label>
-                        <select id="page-orientation">
-                            <option value="portrait">Portrait</option>
-                            <option value="landscape">Landscape</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Text Overlay -->
-            <div class="mb-6">
-                <h4>Text Overlay (Per Page)</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div class="md:col-span-2">
-                        <label for="overlay-text">Overlay Text:</label>
-                        <input type="text" id="overlay-text" placeholder="Text to appear on each page">
-                    </div>
-                    <div>
-                        <label for="overlay-font-size">Font Size:</label>
-                        <input type="number" id="overlay-font-size" value="24" min="8" max="100">
-                    </div>
-                    <div>
-                        <label for="overlay-x-pos">X Position (from left):</label>
-                        <input type="number" id="overlay-x-pos" value="50">
-                    </div>
-                    <div>
-                        <label for="overlay-y-pos">Y Position (from bottom):</label>
-                        <input type="number" id="overlay-y-pos" value="50">
-                    </div>
-                    <div>
-                        <label for="overlay-color">Text Color:</label>
-                        <input type="color" id="overlay-color" value="#FFFFFF">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Meta Tags -->
-            <div class="mb-6">
-                <h4>Meta Tags</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div>
-                        <label for="pdf-title">Title:</label>
-                        <input type="text" id="pdf-title" placeholder="Document Title">
-                    </div>
-                    <div>
-                        <label for="pdf-author">Author:</label>
-                        <input type="text" id="pdf-author" placeholder="Document Author">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="pdf-keywords">Keywords (comma-separated):</label>
-                        <input type="text" id="pdf-keywords" placeholder="keywords, separated, by, comma">
-                    </div>
-                </div>
-            </div>
-
-            <!-- PDF Version & Encryption -->
-            <div class="mb-6">
-                <h4>Version & Security</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div>
-                        <label for="pdf-version">PDF Version:</label>
-                        <select id="pdf-version">
-                            <option value="1.7">1.7 (Default)</option>
-                            <option value="1.4">1.4</option>
-                            <option value="1.5">1.5</option>
-                            <option value="1.6">1.6</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="encryption-password">Encryption Password (Optional):</label>
-                        <input type="password" id="encryption-password" placeholder="Leave blank for no encryption">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customization: Watermark, Header, Footer -->
-            <div>
-                <h4>Page Customization</h4>
-                <div class="mb-4">
-                    <label for="watermark-text">Watermark Text (Optional):</label>
-                    <input type="text" id="watermark-text" placeholder="e.g., DRAFT, CONFIDENTIAL">
-                </div>
-                <div class="mb-4">
-                    <label for="header-text">Header Text (Optional):</label>
-                    <input type="text" id="header-text" placeholder="e.g., Company Name, Document Title">
-                </div>
-                <div>
-                    <label for="footer-text">Footer Text (Optional):</label>
-                    <input type="text" id="footer-text" placeholder="e.g., Page [pageNumber] of [pageCount]">
-                    <p class="text-xs">Use `[pageNumber]` and `[pageCount]` for dynamic page numbering.</p>
-                </div>
-            </div>
-        </div>
-
         <!-- Generate PDF Button -->
         <div class="mt-8 text-center generate-button-container">
             <button id="generate-pdf-button" disabled>
@@ -614,7 +408,7 @@
 
     <script>
         // Destructure necessary modules from pdf-lib
-        const { PDFDocument, rgb, StandardFonts, PDFName, PDFString, PDFArray, PDFDict, PageSizes } = PDFLib;
+        const { PDFDocument, rgb, StandardFonts, PageSizes } = PDFLib;
 
         // --- DOM Element References ---
         const loadingIndicator = document.getElementById('loading-indicator');
@@ -628,25 +422,6 @@
         const uploadedFilesContainer = document.getElementById('uploaded-files-container');
         const uploadedFilesList = document.getElementById('uploaded-files-list');
 
-        const pageSizeSelect = document.getElementById('page-size');
-        const pageOrientationSelect = document.getElementById('page-orientation');
-
-        const overlayTextInput = document.getElementById('overlay-text');
-        const overlayFontSizeInput = document.getElementById('overlay-font-size');
-        const overlayXPosInput = document.getElementById('overlay-x-pos');
-        const overlayYPosInput = document.getElementById('overlay-y-pos');
-        const overlayColorInput = document.getElementById('overlay-color');
-
-        const pdfTitleInput = document.getElementById('pdf-title');
-        const pdfAuthorInput = document.getElementById('pdf-author');
-        const pdfKeywordsInput = document.getElementById('pdf-keywords');
-        const pdfVersionSelect = document.getElementById('pdf-version');
-        const encryptionPasswordInput = document.getElementById('encryption-password');
-
-        const watermarkTextInput = document.getElementById('watermark-text');
-        const headerTextInput = document.getElementById('header-text');
-        const footerTextInput = document.getElementById('footer-text');
-
         const generatePdfButton = document.getElementById('generate-pdf-button');
         const downloadSection = document.getElementById('download-section');
         const downloadPdfLink = document.getElementById('download-pdf-link');
@@ -655,9 +430,8 @@
         const hiddenCtx = hiddenCanvas.getContext('2d');
 
         // --- Global State Variables ---
-        // Array to store uploaded files, their data, and properties
         let uploadedFiles = []; // { id: string, file: File, dataUrl: string, type: string, rotation: number, element: HTMLElement }
-        const MAX_FILES = 20; // Changed max files to 20
+        const MAX_FILES = 20;
         let dragSrcEl = null; // For drag-and-drop reordering
 
         // --- Utility Functions ---
@@ -728,18 +502,6 @@
             element.classList.remove('hidden');
         }
 
-        /**
-         * Converts a color hex string (e.g., "#RRGGBB") to an rgb object for pdf-lib.
-         * @param {string} hex The hex color string.
-         * @returns {object} An rgb object { red, green, blue }.
-         */
-        function hexToRgb(hex) {
-            const r = parseInt(hex.slice(1, 3), 16) / 255;
-            const g = parseInt(hex.slice(3, 5), 16) / 255;
-            const b = parseInt(hex.slice(5, 7), 16) / 255;
-            return rgb(r, g, b);
-        }
-
         // --- File Handling and UI Management ---
 
         /**
@@ -758,14 +520,9 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
 
-                // Skip non-image file types (TXT, DOCX, etc. are not supported for this version)
-                if (!file.type.startsWith('image/')) {
-                    displayError(`Unsupported file type: ${file.name}. Only image files (JPG, PNG, GIF) are supported.`);
-                    continue;
-                }
-                 // Specific check for image types
+                // Only allow image files
                 if (!['image/png', 'image/jpeg', 'image/gif'].includes(file.type)) {
-                    displayError(`Unsupported image format: ${file.name}. Only JPG, PNG, GIF are supported.`);
+                    displayError(`Unsupported file type: ${file.name}. Only JPG, PNG, GIF are supported.`);
                     continue;
                 }
 
@@ -827,10 +584,8 @@
             const itemDiv = document.createElement('div');
             itemDiv.id = fileEntry.id;
             itemDiv.draggable = true;
-            // Apply basic CSS classes for styling from the embedded style block
             itemDiv.classList.add('page-item');
 
-            // Preview content for images only
             const previewContent = `<img src="${fileEntry.dataUrl}" alt="Preview of ${fileEntry.file.name}" style="transform: rotate(${fileEntry.rotation}deg);">`;
 
             itemDiv.innerHTML = `
@@ -849,10 +604,9 @@
                 </div>
             `;
 
-            fileEntry.element = itemDiv; // Store reference to the DOM element
+            fileEntry.element = itemDiv;
             uploadedFilesList.appendChild(itemDiv);
 
-            // Add event listeners for buttons
             const removeBtn = itemDiv.querySelector('.remove-btn');
             if (removeBtn) {
                 removeBtn.addEventListener('click', () => removeFile(fileEntry.id));
@@ -869,7 +623,7 @@
             itemDiv.addEventListener('drop', handleDrop);
             itemDiv.addEventListener('dragend', handleDragEnd);
 
-            generatePdfButton.disabled = false; // Enable generate button
+            generatePdfButton.disabled = false;
         }
 
         /**
@@ -884,9 +638,9 @@
             }
             if (uploadedFiles.length === 0) {
                 hideElement(uploadedFilesContainer);
-                generatePdfButton.disabled = true; // Disable if no files
+                generatePdfButton.disabled = true;
             }
-            hideElement(downloadSection); // Hide download link on file removal
+            hideElement(downloadSection);
             clearError();
         }
 
@@ -899,30 +653,28 @@
             const fileEntry = uploadedFiles.find(entry => entry.id === id);
             if (!fileEntry || !fileEntry.type.startsWith('image/')) return;
 
-            fileEntry.rotation = (fileEntry.rotation + 90) % 360; // Rotate by 90 degrees
+            fileEntry.rotation = (fileEntry.rotation + 90) % 360;
 
-            // Update the preview image rotation
             const imgElement = fileEntry.element.querySelector('img');
             if (imgElement) {
                 imgElement.style.transform = `rotate(${fileEntry.rotation}deg)`;
             }
-            hideElement(downloadSection); // Hide download link on edit
+            hideElement(downloadSection);
             clearError();
         }
 
         // --- Drag and Drop Reordering Logic ---
         function handleDragStart(e) {
-            dragSrcEl = this; // 'this' refers to the element being dragged
+            dragSrcEl = this;
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', this.id); // Set data to transfer (element ID)
+            e.dataTransfer.setData('text/plain', this.id);
             this.classList.add('dragging');
         }
 
         function handleDragOver(e) {
-            e.preventDefault(); // Necessary to allow drop
+            e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             if (this !== dragSrcEl && this.classList.contains('page-item')) {
-                // Add a visual indicator for where the item will be dropped
                 this.classList.add('drag-over');
             }
         }
@@ -940,16 +692,13 @@
                 const draggedElement = document.getElementById(draggedId);
                 const dropTargetElement = this;
 
-                // Find indices in the uploadedFiles array
                 const draggedIndex = uploadedFiles.findIndex(f => f.id === draggedId);
                 const dropTargetIndex = uploadedFiles.findIndex(f => f.id === dropTargetElement.id);
 
                 if (draggedIndex > -1 && dropTargetIndex > -1) {
-                    // Reorder the array
                     const [removed] = uploadedFiles.splice(draggedIndex, 1);
                     uploadedFiles.splice(dropTargetIndex, 0, removed);
 
-                    // Reorder DOM elements
                     if (draggedIndex < dropTargetIndex) {
                         dropTargetElement.parentNode.insertBefore(draggedElement, dropTargetElement.nextSibling);
                     } else {
@@ -961,7 +710,6 @@
 
         function handleDragEnd() {
             this.classList.remove('dragging');
-            // Remove drag-over class from all elements
             document.querySelectorAll('.page-item').forEach(item => {
                 item.classList.remove('drag-over');
             });
@@ -983,51 +731,45 @@
                     return;
                 }
 
-                // Determine page size and orientation
-                const pageSize = PageSizes[pageSizeSelect.value];
+                // Default PDF settings (since customization section is removed)
+                const pageSize = PageSizes.A4; // Default to A4
                 let pageWidth = pageSize[0];
                 let pageHeight = pageSize[1];
+                const pageOrientation = 'portrait'; // Default to portrait
 
-                if (pageOrientationSelect.value === 'landscape') {
-                    [pageWidth, pageHeight] = [pageHeight, pageWidth]; // Swap width and height for landscape
+                if (pageOrientation === 'landscape') {
+                    [pageWidth, pageHeight] = [pageHeight, pageWidth];
                 }
 
-                // Create a new PDF document
                 const pdfDoc = await PDFDocument.create();
                 pdfDoc.registerFontkit(fontkit);
 
-                // Set PDF Meta Tags
-                pdfDoc.setTitle(pdfTitleInput.value || 'Generated Document');
-                pdfDoc.setAuthor(pdfAuthorInput.value || 'PDF Creator Tool');
-                pdfDoc.setKeywords((pdfKeywordsInput.value || 'pdf, generator, tool, online').split(',').map(k => k.trim()));
-                pdfDoc.setProducer('Online PDF Creator Tool');
-                pdfDoc.setCreator('Online PDF Creator Tool');
+                // Hardcoded Meta Tags
+                pdfDoc.setTitle('Generated Image PDF');
+                pdfDoc.setAuthor('Image to PDF Creator');
+                pdfDoc.setKeywords(['image', 'pdf', 'converter', 'tool', 'generated']);
+                pdfDoc.setProducer('Online Image to PDF Tool');
+                pdfDoc.setCreator('Online Image to PDF Tool');
 
-                // Set PDF Version
-                const pdfVersion = parseFloat(pdfVersionSelect.value);
-                pdfDoc.setVersion(pdfVersion);
+                // Hardcoded PDF Version
+                pdfDoc.setVersion('1.7');
 
-                // Embed standard fonts
                 const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
                 const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-                // Removed italicFont as it's not used in current implementation
 
-                const pageMargin = 50; // Margin from edges
+                const pageMargin = 50;
 
-                // Iterate through uploaded files in their current order
                 for (let i = 0; i < uploadedFiles.length; i++) {
                     const fileEntry = uploadedFiles[i];
-                    updateProgress(((i / uploadedFiles.length) * 100) * 0.5, `Adding page ${i + 1} of ${uploadedFiles.length}...`); // 50% for content adding
+                    updateProgress(((i / uploadedFiles.length) * 100) * 0.5, `Adding page ${i + 1} of ${uploadedFiles.length}...`);
 
                     const page = pdfDoc.addPage([pageWidth, pageHeight]);
                     const contentWidth = page.getWidth() - 2 * pageMargin;
                     const contentHeight = page.getHeight() - 2 * pageMargin;
 
-                    // --- Add Image Content ---
                     let image;
                     let imageBytes;
 
-                    // Re-draw image on a hidden canvas to apply rotation before embedding
                     const img = new Image();
                     img.src = fileEntry.dataUrl;
                     await new Promise(resolve => img.onload = resolve);
@@ -1036,7 +778,6 @@
                     hiddenCanvas.height = img.height;
                     hiddenCtx.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
 
-                    // Apply rotation
                     if (fileEntry.rotation !== 0) {
                         hiddenCtx.save();
                         hiddenCtx.translate(hiddenCanvas.width / 2, hiddenCanvas.height / 2);
@@ -1047,19 +788,15 @@
                         hiddenCtx.drawImage(img, 0, 0);
                     }
 
-                    // Get image data from canvas
-                    // Convert GIF to PNG for static embed as pdf-lib embeds GIFs as first frame.
                     const processedDataUrl = hiddenCanvas.toDataURL(fileEntry.type === 'image/gif' ? 'image/png' : fileEntry.type);
                     imageBytes = await fetch(processedDataUrl).then(res => res.arrayBuffer());
 
-                    // Embed image based on type
                     if (fileEntry.type === 'image/png' || fileEntry.type === 'image/gif') {
                         image = await pdfDoc.embedPng(imageBytes);
                     } else if (fileEntry.type === 'image/jpeg') {
                         image = await pdfDoc.embedJpg(imageBytes);
                     }
 
-                    // Scale image to fit page, maintaining aspect ratio
                     const imageRatio = image.width / image.height;
                     let finalImageWidth = contentWidth;
                     let finalImageHeight = contentWidth / imageRatio;
@@ -1069,7 +806,6 @@
                         finalImageWidth = contentHeight * imageRatio;
                     }
 
-                    // Center image on the page
                     const x = pageMargin + (contentWidth - finalImageWidth) / 2;
                     const y = pageMargin + (contentHeight - finalImageHeight) / 2;
 
@@ -1079,148 +815,27 @@
                         width: finalImageWidth,
                         height: finalImageHeight,
                     });
-
-                    // Add text overlay, header, footer, watermark after content is drawn for each page
-                    await drawTextOverlay(page, font);
-                    await drawHeaderFooter(page, i + 1, uploadedFiles.length, boldFont, pageMargin, contentWidth);
-                    await drawWatermark(page, watermarkTextInput.value, boldFont);
                 }
 
-                updateProgress(75, 'Applying encryption and finalizing...');
+                updateProgress(75, 'Finalizing PDF...');
 
-                // --- Apply Encryption (if password provided) ---
-                const encryptionPassword = encryptionPasswordInput.value;
-                let pdfBytes;
-                if (encryptionPassword) {
-                    pdfBytes = await pdfDoc.save({
-                        encryption: {
-                            userPassword: encryptionPassword,
-                            ownerPassword: encryptionPassword,
-                        },
-                    });
-                } else {
-                    pdfBytes = await pdfDoc.save();
-                }
+                const pdfBytes = await pdfDoc.save();
 
                 updateProgress(100, 'PDF generated!');
 
-                // Create a Blob and a download link
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
 
                 downloadPdfLink.href = url;
-                downloadPdfLink.download = `${pdfTitleInput.value.replace(/[^a-zA-Z0-9]/g, '_') || 'document'}.pdf`; // Sanitize filename
+                downloadPdfLink.download = 'generated_images.pdf'; // Simplified filename
                 showElement(downloadSection);
 
             } catch (error) {
-                displayError(`Failed to generate PDF: ${error.message}. Please check your inputs and try again.`);
+                displayError(`Failed to generate PDF: ${error.message}. Please try again.`);
                 console.error('PDF generation error:', error);
             } finally {
-                hideLoading(); // Hide loading indicator
+                hideLoading();
             }
-        }
-
-        /**
-         * Draws the header and footer on a given PDF page.
-         * @param {PDFPage} page The PDF page object.
-         * @param {number} pageNumber The current page number (1-indexed).
-         * @param {number} totalPages The total number of pages.
-         * @param {PDFFont} font The font to use for header/footer.
-         * @param {number} margin The page margin.
-         * @param {number} contentWidth The width available for content.
-         */
-        async function drawHeaderFooter(page, pageNumber, totalPages, font, margin, contentWidth) {
-            const headerText = headerTextInput.value.trim();
-            const footerText = footerTextInput.value.trim();
-            const fontSize = 10;
-            const textColor = rgb(0.5, 0.5, 0.5); // Gray color for header/footer
-
-            // Header
-            if (headerText) {
-                const headerY = page.getHeight() - margin + 20; // Position above top margin
-                page.drawText(headerText, {
-                    x: margin,
-                    y: headerY,
-                    font,
-                    size: fontSize,
-                    color: textColor,
-                });
-            }
-
-            // Footer
-            if (footerText) {
-                let formattedFooterText = footerText
-                    .replace(/\[pageNumber\]/g, pageNumber)
-                    .replace(/\[pageCount\]/g, totalPages);
-
-                const footerY = margin - 30; // Position below bottom margin
-                const footerWidth = font.widthOfTextAtSize(formattedFooterText, fontSize);
-                const footerX = page.getWidth() / 2 - footerWidth / 2; // Center footer
-
-                page.drawText(formattedFooterText, {
-                    x: footerX,
-                    y: footerY,
-                    font,
-                    size: fontSize,
-                    color: textColor,
-                });
-            }
-        }
-
-        /**
-         * Draws a text watermark on a given PDF page.
-         * @param {PDFPage} page The PDF page object.
-         * @param {string} watermarkText The text for the watermark.
-         * @param {PDFFont} font The font to use for the watermark.
-         */
-        async function drawWatermark(page, watermarkText, font) {
-            if (!watermarkText.trim()) return;
-
-            const { width, height } = page.getSize();
-            const fontSize = 72; // Large font size for watermark
-            const opacity = 0.1; // Subtle opacity
-
-            // Calculate text dimensions
-            const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
-            const textHeight = font.heightAtSize(fontSize);
-
-            // Calculate position for diagonal placement
-            // This places the text roughly in the center, rotated
-            const centerX = width / 2;
-            const centerY = height / 2;
-
-            page.drawText(watermarkText, {
-                x: centerX - textWidth / 2, // Adjust X to center after rotation
-                y: centerY - textHeight / 2, // Adjust Y to center after rotation
-                font,
-                size: fontSize,
-                color: rgb(0.5, 0.5, 0.5), // Gray color for watermark
-                opacity: opacity,
-                rotate: PDFLib.degrees(-45), // Rotate by -45 degrees for diagonal effect
-            });
-        }
-
-        /**
-         * Draws a text overlay on a given PDF page.
-         * @param {PDFPage} page The PDF page object.
-         * @param {PDFFont} font The font to use for the overlay.
-         */
-        async function drawTextOverlay(page, font) {
-            const overlayText = overlayTextInput.value.trim();
-            if (!overlayText) return;
-
-            const overlayFontSize = parseInt(overlayFontSizeInput.value) || 24;
-            const overlayX = parseInt(overlayXPosInput.value) || 50;
-            const overlayY = parseInt(overlayYPosInput.value) || 50;
-            const overlayColor = hexToRgb(overlayColorInput.value || '#FFFFFF'); // Default white
-
-            page.drawText(overlayText, {
-                x: overlayX,
-                y: overlayY,
-                font,
-                size: overlayFontSize,
-                color: overlayColor,
-            });
         }
 
         // --- Drag and Drop for Upload Area ---
@@ -1248,16 +863,15 @@
         // File input change listener (for traditional browse)
         fileUploadInput.addEventListener('change', (event) => {
             handleFiles(event.target.files);
-            event.target.value = ''; // Clear input to allow re-uploading same files
+            event.target.value = '';
         });
-
 
         // --- Initial Setup ---
         window.onload = () => {
-            hideLoading(); // Hide loading indicator initially
-            hideElement(downloadSection); // Hide download section initially
-            hideElement(uploadedFilesContainer); // Hide file list initially
-            clearError(); // Clear any initial errors
+            hideLoading();
+            hideElement(downloadSection);
+            hideElement(uploadedFilesContainer);
+            clearError();
         };
     </script>
 </body>
