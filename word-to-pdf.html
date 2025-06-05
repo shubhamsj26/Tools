@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word (TXT) to PDF Converter</title>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text color */
+        }
+
+        .main-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 1.5rem;
+            max-width: 40rem;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        p {
+            text-align: center;
+            color: #cbd5e0;
+            margin-bottom: 2rem;
+        }
+
+        /* Loading Indicator */
+        #loading-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(49, 130, 206, 0.8);
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 600;
+        }
+        #loading-indicator .spinner {
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+            height: 1.25rem;
+            width: 1.25rem;
+            color: white;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        #loading-indicator .progress-bar-container {
+            width: 100%;
+            background-color: #bfdbfe;
+            border-radius: 9999px;
+            height: 0.625rem;
+        }
+        #loading-indicator #progress-bar {
+            background-color: #2b6cb0;
+            height: 0.625rem;
+            border-radius: 9999px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        /* Error Message */
+        #error-message-container {
+            background-color: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* File Upload Section */
+        .file-upload-section label {
+            display: block;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .drag-area {
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .drag-area:hover {
+            border-color: #60a5fa;
+        }
+        .drag-area.drag-over {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: #60A5FA;
+        }
+        .drag-area i {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+        }
+        .drag-area p {
+            color: #cbd5e0;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        .drag-area p span {
+            color: #60a5fa;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+        .drag-area .note {
+            font-size: 0.875rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+        }
+        .drag-area .error-note {
+            color: #f87171;
+            margin-top: 0.5rem;
+        }
+
+        /* Generate PDF Button */
+        .generate-button-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        #generate-pdf-button {
+            width: 100%;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            background-color: #10b981;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            outline: none;
+        }
+        #generate-pdf-button:hover {
+            background-color: #059669;
+            transform: scale(1.05);
+        }
+        #generate-pdf-button:focus-visible {
+            outline: 2px solid #34d399;
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        #generate-pdf-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #generate-pdf-button i {
+            margin-right: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            #generate-pdf-button {
+                width: auto;
+            }
+        }
+
+        /* Download Section */
+        #download-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        #download-section h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        #download-pdf-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 700;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            outline: none;
+        }
+        #download-pdf-link:hover {
+            background-color: #2563eb;
+            transform: scale(1.05);
+        }
+        #download-pdf-link:focus-visible {
+            outline: 2px solid #60a5fa;
+            outline-offset: 2px;
+            border-radius: 9999px;
+        }
+        #download-pdf-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-700 to-purple-900">
+
+    <div class="main-container">
+        <h1>Word (TXT) to PDF Converter</h1>
+        <p>Upload a plain text (.txt) file to convert it into a PDF document.</p>
+        <p class="error-note">Note: This tool converts plain text files (.txt) to PDF. It does NOT convert actual .docx files. For .docx conversion, a server-side solution is required.</p>
+
+        <!-- Loading Indicator & Progress Bar -->
+        <div id="loading-indicator" class="hidden">
+            <div class="flex items-center mb-2">
+                <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span id="loading-text">Processing file...</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Error Message Display -->
+        <div id="error-message-container" class="hidden">
+            <p class="font-semibold">Error:</p>
+            <p id="error-message-text"></p>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="mb-6 file-upload-section">
+            <label for="file-upload">
+                1. Upload your .TXT File:
+            </label>
+            <div id="drop-area" class="drag-area">
+                <input type="file" id="file-upload" accept="text/plain" class="hidden">
+                <p><i class="fas fa-file-word"></i></p>
+                <p>Drag & Drop your TXT file here, or <span>Click to Browse</span></p>
+                <p class="note">Only .TXT files are supported for client-side conversion.</p>
+            </div>
+        </div>
+
+        <!-- Selected File Display -->
+        <div id="selected-file-container" class="mt-6 mb-8 hidden">
+            <h3>Selected File:</h3>
+            <div id="selected-file-info" class="flex items-center justify-between p-3 bg-white bg-opacity-10 rounded-lg border border-white border-opacity-20 shadow-sm text-gray-200">
+                <span id="selected-file-name"></span>
+                <button id="remove-file-button" class="p-2 rounded-full bg-red-500 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400" title="Remove File">
+                    <i class="fas fa-trash-alt text-white text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Generate PDF Button -->
+        <div class="mt-8 text-center generate-button-container">
+            <button id="generate-pdf-button" disabled>
+                <i class="fas fa-file-export mr-2"></i> Convert to PDF
+            </button>
+        </div>
+
+        <!-- Download Link -->
+        <div id="download-section" class="mt-8 text-center hidden">
+            <h3>Download Your PDF</h3>
+            <a id="download-pdf-link" href="#" download="converted_document.pdf">
+                <i class="fas fa-download mr-2"></i> Download PDF
+            </a>
+        </div>
+
+    </div>
+
+    <!-- pdf-lib CDN -->
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@1.0.1/dist/fontkit.umd.min.js"></script>
+
+    <script>
+        // Destructure necessary modules from pdf-lib
+        const { PDFDocument, rgb, StandardFonts, PageSizes } = PDFLib;
+
+        // --- DOM Element References ---
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const loadingText = document.getElementById('loading-text');
+        const progressBar = document.getElementById('progress-bar');
+        const errorMessageContainer = document.getElementById('error-message-container');
+        const errorMessageText = document.getElementById('error-message-text');
+
+        const dropArea = document.getElementById('drop-area');
+        const fileUploadInput = document.getElementById('file-upload');
+        const selectedFileContainer = document.getElementById('selected-file-container');
+        const selectedFileInfo = document.getElementById('selected-file-info');
+        const selectedFileNameSpan = document.getElementById('selected-file-name');
+        const removeFileButton = document.getElementById('remove-file-button');
+
+        const generatePdfButton = document.getElementById('generate-pdf-button');
+        const downloadSection = document.getElementById('download-section');
+        const downloadPdfLink = document.getElementById('download-pdf-link');
+
+        // --- Global State Variables ---
+        let uploadedFile = null; // Stores the single uploaded File object
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a message in the error container.
+         * @param {string} message The error message to display.
+         */
+        function displayError(message) {
+            errorMessageText.textContent = message;
+            errorMessageContainer.classList.remove('hidden');
+        }
+
+        /**
+         * Clears any displayed error messages.
+         */
+        function clearError() {
+            errorMessageText.textContent = '';
+            errorMessageContainer.classList.add('hidden');
+        }
+
+        /**
+         * Shows the loading indicator and disables the generate button.
+         * @param {string} text The text to display in the loading indicator.
+         */
+        function showLoading(text = 'Processing file...') {
+            loadingText.textContent = text;
+            progressBar.style.width = '0%';
+            loadingIndicator.classList.remove('hidden');
+            generatePdfButton.disabled = true;
+            generatePdfButton.classList.add('opacity-50', 'cursor-not-allowed');
+            downloadSection.classList.add('hidden'); // Hide download link during generation
+            clearError(); // Clear any previous errors
+        }
+
+        /**
+         * Hides the loading indicator and enables the generate button.
+         */
+        function hideLoading() {
+            loadingIndicator.classList.add('hidden');
+            generatePdfButton.disabled = uploadedFile === null; // Enable only if a file is present
+            generatePdfButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        /**
+         * Updates the progress bar.
+         * @param {number} percentage The progress percentage (0-100).
+         * @param {string} text Optional text to update the loading message.
+         */
+        function updateProgress(percentage, text = loadingText.textContent) {
+            progressBar.style.width = `${percentage}%`;
+            loadingText.textContent = text;
+        }
+
+        /**
+         * Hides an HTML element by adding the 'hidden' class.
+         * @param {HTMLElement} element The element to hide.
+         */
+        function hideElement(element) {
+            element.classList.add('hidden');
+        }
+
+        /**
+         * Shows an HTML element by removing the 'hidden' class.
+         * @param {HTMLElement} element The element to show.
+         */
+        function showElement(element) {
+            element.classList.remove('hidden');
+        }
+
+        // --- File Handling and UI Management ---
+
+        /**
+         * Handles the uploaded file.
+         * @param {File} file The File object to process.
+         */
+        async function handleFile(file) {
+            clearError();
+            hideElement(downloadSection);
+
+            if (!file) {
+                uploadedFile = null;
+                hideElement(selectedFileContainer);
+                hideLoading();
+                return;
+            }
+
+            // Only allow plain text files
+            if (file.type !== 'text/plain') {
+                displayError(`Unsupported file type: ${file.name}. Only plain text (.txt) files are supported.`);
+                uploadedFile = null;
+                hideElement(selectedFileContainer);
+                hideLoading();
+                return;
+            }
+
+            uploadedFile = file;
+            selectedFileNameSpan.textContent = file.name;
+            showElement(selectedFileContainer);
+            hideLoading(); // Enable generate button
+        }
+
+        // --- Main PDF Generation Function ---
+
+        /**
+         * Generates the PDF document from the uploaded text file.
+         */
+        async function generatePdf() {
+            if (!uploadedFile) {
+                displayError('Please upload a .TXT file to convert.');
+                return;
+            }
+
+            showLoading('Reading text content...');
+
+            try {
+                // Read the text content from the file
+                const textContent = await uploadedFile.text();
+                if (!textContent.trim()) {
+                    displayError('The uploaded text file is empty or contains only whitespace.');
+                    hideLoading();
+                    return;
+                }
+
+                updateProgress(25, 'Creating PDF document...');
+
+                // Default PDF settings
+                const pageSize = PageSizes.A4;
+                const pageWidth = pageSize[0];
+                const pageHeight = pageSize[1];
+                const pageMargin = 50;
+                const contentWidth = pageWidth - 2 * pageMargin;
+
+                const pdfDoc = await PDFDocument.create();
+                pdfDoc.registerFontkit(fontkit); // Register fontkit
+
+                // Hardcoded Meta Tags
+                pdfDoc.setTitle(uploadedFile.name.replace('.txt', '.pdf') || 'Converted Document');
+                pdfDoc.setAuthor('TXT to PDF Converter');
+                pdfDoc.setKeywords(['text', 'pdf', 'converter', 'tool', 'generated']);
+                pdfDoc.setProducer('Online TXT to PDF Tool');
+                pdfDoc.setCreator('Online TXT to PDF Tool');
+                pdfDoc.setVersion('1.7');
+
+                const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                const fontSize = 12;
+                const lineHeight = fontSize * 1.5;
+                const textColor = rgb(0.1, 0.1, 0.1); // Dark gray for better readability on default white background
+
+                let currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+                let yPos = pageHeight - pageMargin; // Start from top margin
+
+                const words = textContent.split(' ');
+                let currentLine = '';
+
+                updateProgress(50, 'Adding text to pages...');
+
+                for (let i = 0; i < words.length; i++) {
+                    const word = words[i];
+                    const testLine = currentLine === '' ? word : `${currentLine} ${word}`;
+                    const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+                    if (textWidth < contentWidth) {
+                        currentLine = testLine;
+                    } else {
+                        // Draw current line before adding new word
+                        if (yPos < pageMargin + lineHeight) { // Check if new page is needed
+                            currentPage.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
+                            currentPage = pdfDoc.addPage([pageWidth, pageHeight]); // Add new page
+                            yPos = pageHeight - pageMargin;
+                        }
+                        currentPage.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
+                        yPos -= lineHeight;
+                        currentLine = word; // Start new line with current word
+                    }
+                }
+                // Draw any remaining text on the last line
+                if (currentLine !== '') {
+                    if (yPos < pageMargin + lineHeight) {
+                        currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+                        yPos = pageHeight - pageMargin;
+                    }
+                    currentPage.drawText(currentLine, { x: pageMargin, y: yPos, font, size: fontSize, color: textColor });
+                }
+
+                updateProgress(75, 'Finalizing PDF...');
+
+                const pdfBytes = await pdfDoc.save();
+
+                updateProgress(100, 'PDF generated!');
+
+                // Create a Blob and a download link
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                downloadPdfLink.href = url;
+                downloadPdfLink.download = uploadedFile.name.replace('.txt', '.pdf') || 'converted_document.pdf';
+                showElement(downloadSection);
+
+            } catch (error) {
+                displayError(`Failed to convert file to PDF: ${error.message}.`);
+                console.error('PDF conversion error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Drag and Drop for Upload Area
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('drag-over');
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('drag-over');
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]); // Only handle the first file for single file upload
+            }
+        });
+
+        // Click to browse functionality
+        dropArea.addEventListener('click', () => {
+            fileUploadInput.click();
+        });
+
+        // File input change listener (for traditional browse)
+        fileUploadInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+            event.target.value = ''; // Clear input to allow re-uploading same file
+        });
+
+        // Remove file button
+        removeFileButton.addEventListener('click', () => {
+            handleFile(null); // Clear the selected file
+        });
+
+        // Generate PDF Button Click
+        generatePdfButton.addEventListener('click', generatePdf);
+
+        // --- Initial Setup ---
+        window.onload = () => {
+            hideLoading();
+            hideElement(downloadSection);
+            hideElement(selectedFileContainer);
+            clearError();
+        };
+    </script>
+</body>
+</html>
