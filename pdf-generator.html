@@ -337,7 +337,7 @@
         <h1>
             Image to PDF Creator
         </h1>
-        <p>Combine multiple images into a single PDF document with custom settings.</p>
+        <p>Combine multiple images into a single PDF document.</p>
 
         <!-- Loading Indicator & Progress Bar -->
         <div id="loading-indicator" class="hidden">
@@ -731,7 +731,7 @@
                     return;
                 }
 
-                // Default PDF settings (since customization section is removed)
+                // Default PDF settings (hardcoded)
                 const pageSize = PageSizes.A4; // Default to A4
                 let pageWidth = pageSize[0];
                 let pageHeight = pageSize[1];
@@ -754,8 +754,9 @@
                 // Hardcoded PDF Version
                 pdfDoc.setVersion('1.7');
 
+                // No need to embed fonts if no text is drawn (watermark, header, footer, overlay are removed)
+                // However, pdf-lib might still implicitly need a font for basic operations, so keep Helvetica.
                 const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-                const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
                 const pageMargin = 50;
 
@@ -815,6 +816,9 @@
                         width: finalImageWidth,
                         height: finalImageHeight,
                     });
+
+                    // Watermark, Header, Footer, Text Overlay are removed from customization
+                    // No drawing functions for these elements will be called here.
                 }
 
                 updateProgress(75, 'Finalizing PDF...');
