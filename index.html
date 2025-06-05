@@ -1,281 +1,391 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Converter - AllTools</title>
-    <!-- Favicon - You might want to replace this with your own favicon -->
-    <link rel="icon" href="https://placehold.co/32x32/000000/FFFFFF?text=AT" type="image/x-icon">
 
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Free online image converter by AllTools. Convert images to JPG, PNG, WEBP, and more. Fast, easy, and secure.">
-    <meta name="keywords" content="image converter, convert image, JPG to PNG, PNG to JPG, WEBP converter, online image tool, free image converter, taskngames.com">
-    <link rel="canonical" href="https://taskngames.com/image-converter.html" />
+    <meta charset="UTF-8">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://taskngames.com/image-converter.html">
-    <meta property="og:title" content="Image Converter - AllTools">
-    <meta property="og:description" content="Free online image converter by AllTools. Convert images to JPG, PNG, WEBP, and more. Fast, easy, and secure.">
-    <meta property="og:image" content="https://placehold.co/1200x630/667eea/FFFFFF?text=Image+Converter">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://taskngames.com/image-converter.html">
-    <meta property="twitter:title" content="Image Converter - AllTools">
-    <meta property="twitter:description" content="Free online image converter by AllTools. Convert images to JPG, PNG, WEBP, and more. Fast, easy, and secure.">
-    <meta property="twitter:image" content="https://placehold.co/1200x675/667eea/FFFFFF?text=Image+Converter">
+    <title>AllTools - Your Free Online Utility Suite</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7fafc; /* Light gray background */
-        }
-        .tool-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .header-nav a, .footer-nav a {
-            transition: color 0.3s ease;
-        }
-        .header-nav a:hover, .footer-nav a:hover {
-            color: #2563eb; /* Tailwind blue-600 */
-        }
-        .logo-text {
-            font-weight: 700;
-            font-size: 1.75rem; /* Equivalent to text-2xl or a bit more */
-            color: #1e3a8a; /* Tailwind blue-800 */
-        }
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Example gradient */
-        }
-        /* Custom modal styles for alerts */
-        .custom-modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .custom-modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            text-align: center;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+            background-color: #f7fafc; /* Light gray background */
+
+        }
+
+        .tool-card {
+
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        }
+
+        .tool-card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+        }
+
+        .header-nav a, .footer-nav a {
+
+            transition: color 0.3s ease;
+
+        }
+
+        .header-nav a:hover, .footer-nav a:hover {
+
+            color: #2563eb; /* Tailwind blue-600 */
+
+        }
+
+        .logo-text {
+
+            font-weight: 700;
+
+            font-size: 1.75rem; /* Equivalent to text-2xl or a bit more */
+
+            color: #1e3a8a; /* Tailwind blue-800 */
+
+        }
+
+        .hero-section {
+
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Example gradient */
+
+        }
+
+    </style>
+
 </head>
+
 <body class="flex flex-col min-h-screen">
 
-    <!-- Header (Copied from your index.html) -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo -->
-            <a href="/" class="logo-text flex items-center">
-                <svg class="w-8 h-8 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                AllTools
-            </a>
-            <!-- Navigation Menu -->
-            <nav class="header-nav space-x-6">
-                <a href="/" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
-                <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
-                <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Main Content for Image Converter -->
-    <main class="flex-grow py-12 md:py-20 bg-gray-50">
-        <div class="container mx-auto px-6 max-w-3xl">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-6">Image Converter</h1>
-            <p class="text-lg text-center text-gray-600 mb-12">
-                Convert your images to various formats quickly and easily right in your browser.
-            </p>
 
-            <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center">
-                <!-- File Input Section -->
-                <div class="mb-8 w-full">
-                    <label for="imageInput" class="block text-gray-700 text-lg font-semibold mb-3 text-center">Upload your image:</label>
-                    <input type="file" id="imageInput" accept="image/*" class="w-full p-4 border-2 border-dashed border-blue-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
-                    <p class="text-sm text-gray-500 mt-2 text-center">Supports JPG, PNG, WEBP, GIF, and more.</p>
-                </div>
+    <!-- Header -->
 
-                <!-- Output Format Section -->
-                <div class="mb-8 w-full">
-                    <label for="outputFormat" class="block text-gray-700 text-lg font-semibold mb-3 text-center">Select output format:</label>
-                    <select id="outputFormat" class="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:border-blue-500">
-                        <option value="image/jpeg">JPG</option>
-                        <option value="image/png">PNG</option>
-                        <option value="image/webp">WEBP</option>
-                    </select>
-                </div>
+    <header class="bg-white shadow-md sticky top-0 z-50">
 
-                <!-- Conversion Button -->
-                <button id="convertBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                    Convert Image
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </button>
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
 
-                <!-- Loading Indicator -->
-                <div id="loadingIndicator" class="mt-8 hidden text-blue-600 font-medium">
-                    <i class="fas fa-spinner fa-spin mr-2"></i> Converting...
-                </div>
+            <!-- Logo -->
 
-                <!-- Download Link -->
-                <div id="downloadArea" class="mt-10 w-full text-center hidden">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Your Converted Image:</h3>
-                    <img id="convertedImagePreview" src="" alt="Converted Image" class="max-w-full h-auto mx-auto border border-gray-300 rounded-lg mb-6 shadow-md">
-                    <a id="downloadLink" href="#" download class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300">
-                        Download Image
-                        <i class="fas fa-download ml-2"></i>
-                    </a>
-                </div>
+            <a href="/" class="logo-text flex items-center">
 
-                <!-- Canvas for image processing (hidden) -->
-                <canvas id="imageCanvas" class="hidden"></canvas>
-            </div>
-        </div>
-    </main>
+                <svg class="w-8 h-8 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
 
-    <!-- Footer (Copied from your index.html) -->
-    <footer class="bg-gray-800 text-gray-300 py-8">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <!-- Footer Navigation -->
-                <nav class="footer-nav space-x-6 mb-4 md:mb-0">
-                    <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
-                    <a href="/terms-conditions" class="hover:text-white">Terms & Conditions</a>
-                    <a href="/" class="hover:text-white">Home</a>
-                </nav>
-                <!-- Copyright Notice -->
-                <p class="text-sm">&copy; <span id="currentYear"></span> AllTools. All Rights Reserved.</p>
-            </div>
-        </div>
-    </footer>
+                AllTools
 
-    <script>
-        // Dynamically set the current year in the footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+            </a>
 
-        const imageInput = document.getElementById('imageInput');
-        const outputFormat = document.getElementById('outputFormat');
-        const convertBtn = document.getElementById('convertBtn');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const downloadArea = document.getElementById('downloadArea');
-        const convertedImagePreview = document.getElementById('convertedImagePreview');
-        const downloadLink = document.getElementById('downloadLink');
-        const imageCanvas = document.getElementById('imageCanvas');
-        const ctx = imageCanvas.getContext('2d');
+            <!-- Navigation Menu -->
 
-        // Function to display a custom modal message instead of alert()
-        function showMessageModal(message, type = 'info') {
-            let modalBackdrop = document.createElement('div');
-            modalBackdrop.className = 'custom-modal-backdrop';
-            modalBackdrop.id = 'messageModalBackdrop';
+            <nav class="header-nav space-x-6">
 
-            let modalContent = document.createElement('div');
-            modalContent.className = 'custom-modal-content';
+                <a href="/" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
 
-            let iconClass = '';
-            let textColor = 'text-gray-800';
-            if (type === 'error') {
-                iconClass = 'fas fa-exclamation-circle text-red-500';
-                textColor = 'text-red-700';
-            } else if (type === 'success') {
-                iconClass = 'fas fa-check-circle text-green-500';
-                textColor = 'text-green-700';
-            } else {
-                iconClass = 'fas fa-info-circle text-blue-500';
-                textColor = 'text-blue-700';
-            }
+                <a href="#about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
 
-            modalContent.innerHTML = `
-                <div class="text-4xl mb-4 ${textColor}"><i class="${iconClass}"></i></div>
-                <p class="text-xl font-semibold mb-6 ${textColor}">${message}</p>
-                <button id="modalCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">OK</button>
-            `;
+                <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
 
-            modalBackdrop.appendChild(modalContent);
-            document.body.appendChild(modalBackdrop);
+            </nav>
 
-            document.getElementById('modalCloseBtn').addEventListener('click', () => {
-                modalBackdrop.remove();
-            });
-        }
+        </div>
 
-        convertBtn.addEventListener('click', () => {
-            const file = imageInput.files[0];
-            if (!file) {
-                showMessageModal('Please select an image file first!', 'error');
-                return;
-            }
+    </header>
 
-            loadingIndicator.classList.remove('hidden'); // Show loading indicator
-            downloadArea.classList.add('hidden'); // Hide previous download area
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    // Set canvas dimensions to the image dimensions
-                    imageCanvas.width = img.width;
-                    imageCanvas.height = img.height;
-                    ctx.drawImage(img, 0, 0); // Draw the image onto the canvas
 
-                    const format = outputFormat.value;
-                    let quality = 0.9; // Default quality for JPEG/WEBP
+    <!-- Main Body Content -->
 
-                    // Convert canvas content to the selected format
-                    try {
-                        let convertedDataUrl;
-                        if (format === 'image/jpeg' || format === 'image/webp') {
-                            convertedDataUrl = imageCanvas.toDataURL(format, quality);
-                        } else {
-                            convertedDataUrl = imageCanvas.toDataURL(format);
-                        }
+    <main class="flex-grow">
 
-                        convertedImagePreview.src = convertedDataUrl;
-                        downloadLink.href = convertedDataUrl;
+        <!-- Hero Section -->
 
-                        // Set download filename based on original file name and new format
-                        const originalFileName = file.name.split('.').slice(0, -1).join('.');
-                        const newExtension = format.split('/')[1]; // e.g., 'jpeg' or 'png'
-                        downloadLink.download = `${originalFileName}.${newExtension}`;
+        <section class="hero-section text-white py-16 md:py-24">
 
-                        loadingIndicator.classList.add('hidden'); // Hide loading indicator
-                        downloadArea.classList.remove('hidden'); // Show download area
-                        showMessageModal('Image converted successfully!', 'success');
-                    } catch (error) {
-                        loadingIndicator.classList.add('hidden');
-                        showMessageModal(`Error during conversion: ${error.message}. Please try again or select a different image.`, 'error');
-                        console.error('Conversion error:', error);
-                    }
-                };
-                img.onerror = () => {
-                    loadingIndicator.classList.add('hidden');
-                    showMessageModal('Could not load the image. Please ensure it is a valid image file.', 'error');
-                };
-                img.src = e.target.result; // Load image data from FileReader
-            };
-            reader.onerror = () => {
-                loadingIndicator.classList.add('hidden');
-                showMessageModal('Error reading file. Please try again.', 'error');
-            };
-            reader.readAsDataURL(file); // Read the selected file as a Data URL
-        });
-    </script>
+            <div class="container mx-auto px-6 text-center">
+
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Your Ultimate Online Toolkit</h1>
+
+                <p class="text-lg md:text-xl mb-8 text-indigo-100">Convert, create, and manage your files effortlessly with our suite of free online tools.</p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Tools Grid Section -->
+
+        <section class="py-12 md:py-20 bg-gray-50">
+
+            <div class="container mx-auto px-6">
+
+                <h2 class="text-3xl font-semibold text-center text-gray-800 mb-10 md:mb-16">Discover Our Tools</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+
+
+                    <!-- Tool: Image Converter -->
+
+                    <a href="Image-converter.html" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-blue-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-image fa-2x text-blue-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Image Converter</h3>
+
+                        <p class="text-gray-600 text-sm">Convert images between various formats like JPG, PNG, WEBP, GIF, and more.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: PDF Generator -->
+
+                    <a href="pdf-generator.html" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-red-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-file-pdf fa-2x text-red-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">PDF Generator</h3>
+
+                        <p class="text-gray-600 text-sm">Create PDF documents from text, images, or other file types quickly.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: Word to PDF -->
+
+                    <a href="word-to-pdf.html" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-green-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-file-word fa-2x text-green-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Word to PDF</h3>
+
+                        <p class="text-gray-600 text-sm">Easily convert your Microsoft Word documents (.doc, .docx) to PDF format.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: PDF to Word -->
+
+                    <a href="/pdf-to-word" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-purple-100 p-4 rounded-full mb-4">
+
+                             <i class="fas fa-file-alt fa-2x text-purple-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">PDF to Word</h3>
+
+                        <p class="text-gray-600 text-sm">Convert PDF files back to editable Microsoft Word documents.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: Text to Speech -->
+
+                    <a href="/text-to-speech" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-yellow-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-volume-up fa-2x text-yellow-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Text to Speech</h3>
+
+                        <p class="text-gray-600 text-sm">Convert written text into natural-sounding speech in various voices.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: QR Code Generator -->
+
+                    <a href="qr-code-generator.html" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-indigo-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-qrcode fa-2x text-indigo-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">QR Code Generator</h3>
+
+                        <p class="text-gray-600 text-sm">Create custom QR codes for URLs, text, contact information, and more.</p>
+
+                    </a>
+
+
+
+                     <!-- Tool: Password Generator -->
+
+                    <a href="/password-generator" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-pink-100 p-4 rounded-full mb-4">
+
+                            <i class="fas fa-key fa-2x text-pink-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Password Generator</h3>
+
+                        <p class="text-gray-600 text-sm">Generate strong, random passwords to enhance your online security.</p>
+
+                    </a>
+
+
+
+                    <!-- Tool: Markdown Editor -->
+
+                    <a href="/markdown-editor" class="tool-card bg-white p-6 rounded-lg shadow-lg flex flex-col items-center text-center no-underline hover:no-underline">
+
+                        <div class="bg-teal-100 p-4 rounded-full mb-4">
+
+                            <i class="fab fa-markdown fa-2x text-teal-600"></i>
+
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Markdown Editor</h3>
+
+                        <p class="text-gray-600 text-sm">Write and preview Markdown text in real-time with a simple interface.</p>
+
+                    </a>
+
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- About Section Placeholder -->
+
+        <section id="about" class="py-12 md:py-20 bg-white">
+
+            <div class="container mx-auto px-6 text-center">
+
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">About AllTools</h2>
+
+                <p class="text-gray-600 max-w-2xl mx-auto">
+
+                    AllTools is dedicated to providing simple, free, and effective online utilities for everyone. Our mission is to make everyday digital tasks easier and more accessible. We believe in privacy and ease of use, ensuring your data is safe and our tools are intuitive.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Contact Section Placeholder -->
+
+        <section id="contact" class="py-12 md:py-20 bg-gray-50">
+
+            <div class="container mx-auto px-6 text-center">
+
+                 <h2 class="text-3xl font-semibold text-gray-800 mb-6">Get In Touch</h2>
+
+                <p class="text-gray-600 max-w-xl mx-auto mb-8">
+
+                    Have questions, suggestions, or just want to say hi? We'd love to hear from you!
+
+                </p>
+
+                <a href="mailto:contact@alltools.example.com" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300">
+
+                    Contact Us
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+    </main>
+
+
+
+    <!-- Footer -->
+
+    <footer class="bg-gray-800 text-gray-300 py-8">
+
+        <div class="container mx-auto px-6">
+
+            <div class="flex flex-col md:flex-row justify-between items-center">
+
+                <!-- Footer Navigation -->
+
+                <nav class="footer-nav space-x-6 mb-4 md:mb-0">
+
+                    <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
+
+                    <a href="/terms-conditions" class="hover:text-white">Terms & Conditions</a>
+
+                    <a href="/" class="hover:text-white">Home</a>
+
+                </nav>
+
+                <!-- Copyright Notice -->
+
+                <p class="text-sm">&copy; <span id="currentYear"></span> AllTools. All Rights Reserved.</p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <script>
+
+        // Dynamically set the current year in the footer
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    </script>
+
+
+
 </body>
+
 </html>
